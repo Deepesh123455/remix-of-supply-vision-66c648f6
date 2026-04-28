@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { AppProvider, useApp } from "@/context/AppContext";
 import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
 import DashboardScreen from "./screens/DashboardScreen";
@@ -9,26 +10,36 @@ import SuppliersScreen from "./screens/SuppliersScreen";
 import AgentsScreen from "./screens/AgentsScreen";
 import WhatsAppScreen from "./screens/WhatsAppScreen";
 import OnboardScreen from "./screens/OnboardScreen";
+import TransferScreen from "./screens/TransferScreen";
 import POModal from "./POModal";
 
-export type ScreenName = "dashboard" | "alerts" | "inventory" | "forecast" | "suppliers" | "agents" | "whatsapp" | "onboard";
+export type ScreenName = "dashboard" | "alerts" | "inventory" | "forecast" | "suppliers" | "agents" | "whatsapp" | "onboard" | "transfer";
 
-const DashboardLayout = () => {
+const Inner = () => {
   const [activeScreen, setActiveScreen] = useState<ScreenName>("dashboard");
-  const [modalOpen, setModalOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { metrics, criticalAlerts, transfers } = useApp();
+  const pendingTransferCount = transfers.filter(t => t.status === "pending").length;
+  const mainRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (mainRef.current) {
+      mainRef.current.scrollTop = 0;
+    }
+  }, [activeScreen]);
 
   const renderScreen = () => {
     switch (activeScreen) {
-      case "dashboard": return <DashboardScreen onShowModal={() => setModalOpen(true)} onNavigate={setActiveScreen} />;
-      case "alerts": return <AlertsScreen onShowModal={() => setModalOpen(true)} />;
-      case "inventory": return <InventoryScreen onShowModal={() => setModalOpen(true)} onNavigate={setActiveScreen} />;
-      case "forecast": return <ForecastScreen />;
-      case "suppliers": return <SuppliersScreen />;
-      case "agents": return <AgentsScreen />;
-      case "whatsapp": return <WhatsAppScreen />;
-      case "onboard": return <OnboardScreen />;
-      default: return <DashboardScreen onShowModal={() => setModalOpen(true)} onNavigate={setActiveScreen} />;
+      case "dashboard":  return <DashboardScreen onNavigate={setActiveScreen} />;
+      case "alerts":     return <AlertsScreen />;
+      case "inventory":  return <InventoryScreen onNavigate={setActiveScreen} />;
+      case "forecast":   return <ForecastScreen />;
+      case "suppliers":  return <SuppliersScreen />;
+      case "agents":     return <AgentsScreen />;
+      case "whatsapp":   return <WhatsAppScreen />;
+      case "onboard":    return <OnboardScreen />;
+      case "transfer":   return <TransferScreen />;
+      default:           return <DashboardScreen onNavigate={setActiveScreen} />;
     }
   };
 
@@ -42,36 +53,43 @@ const DashboardLayout = () => {
           onNavigate={(screen) => { setActiveScreen(screen); setSidebarOpen(false); }}
           mobileOpen={sidebarOpen}
           onClose={() => setSidebarOpen(false)}
+          alertCount={criticalAlerts.length}
+          transferCount={pendingTransferCount}
         />
 
-        <main className="flex-1 overflow-y-auto">
-          {/* Ticker */}
-          <div className="bg-primary/5 border-b border-primary/10 px-6 py-2 flex gap-8 overflow-x-auto text-xs">
-            <TickerItem label="SKUs Tracked" value="8,420" />
-            <TickerItem label="Today's Sell-out" value="+₹6.8L" variant="up" />
-            <TickerItem label="EBO Size Breaks" value="142 SKUs" variant="down" />
-            <TickerItem label="Auto Cut/PO Orders" value="14 today" variant="up" />
-            <TickerItem label="Aged Stock (90d+)" value="₹2.1Cr" variant="down" />
-            <TickerItem label="Forecast Accuracy" value="91.4%" variant="up" />
+        <main ref={mainRef} className="flex-1 overflow-y-auto">
+          <div className="bg-primary/5 border-b border-primary/10 px-6 py-2.5 flex items-center gap-8 overflow-x-auto">
+            <div className="flex items-center gap-1.5 shrink-0">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">Live</span>
+            </div>
+            <TickerItem label="Stock Value" value={metrics.totalInventory} />
+            <TickerItem label="Sales Today" value={metrics.sellThroughToday} />
+            <TickerItem label="AI Accuracy" value={metrics.forecastAccuracy} />
+            <TickerItem label="Alerts" value={String(criticalAlerts.length) + " urgent"} highlight={criticalAlerts.length > 0} />
           </div>
 
-          <div className="p-6 animate-in fade-in duration-300">
+          <div className="p-4 md:p-6 animate-in fade-in duration-300">
             {renderScreen()}
           </div>
         </main>
       </div>
 
-      <POModal open={modalOpen} onClose={() => setModalOpen(false)} />
+      <POModal />
     </div>
   );
 };
 
-const TickerItem = ({ label, value, variant }: { label: string; value: string; variant?: "up" | "down" }) => (
-  <div className="flex gap-2 whitespace-nowrap">
-    <span className="text-muted-foreground">{label}:</span>
-    <span className={variant === "up" ? "text-success font-medium" : variant === "down" ? "text-destructive font-medium" : "text-foreground font-medium"}>
-      {value}
-    </span>
+const DashboardLayout = () => (
+  <AppProvider>
+    <Inner />
+  </AppProvider>
+);
+
+const TickerItem = ({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) => (
+  <div className="flex gap-2 whitespace-nowrap items-center">
+    <span className="text-[11px] text-muted-foreground font-medium">{label}:</span>
+    <span className={`text-[11px] font-bold ${highlight ? "text-destructive" : "text-foreground"}`}>{value}</span>
   </div>
 );
 

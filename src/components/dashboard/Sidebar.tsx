@@ -6,43 +6,53 @@ interface SidebarProps {
   onNavigate: (screen: ScreenName) => void;
   mobileOpen: boolean;
   onClose: () => void;
+  alertCount?: number;
+  transferCount?: number;
 }
 
-const navItems: { section: string; items: { icon: string; label: string; screen: ScreenName; badge?: string; badgeColor?: string }[] }[] = [
-  {
-    section: "Overview",
-    items: [
-      { icon: "◈", label: "Dashboard", screen: "dashboard" },
-      { icon: "⚡", label: "AI Alerts", screen: "alerts", badge: "7" },
-    ],
-  },
-  {
-    section: "Intelligence",
-    items: [
-      { icon: "▦", label: "Inventory", screen: "inventory" },
-      { icon: "∿", label: "Forecast", screen: "forecast" },
-      { icon: "◎", label: "Suppliers", screen: "suppliers", badge: "2", badgeColor: "warning" },
-    ],
-  },
-  {
-    section: "Agents",
-    items: [
-      { icon: "⬡", label: "Active Agents", screen: "agents", badge: "3", badgeColor: "success" },
-      { icon: "✦", label: "WhatsApp Bot", screen: "whatsapp" },
-    ],
-  },
-  {
-    section: "Setup",
-    items: [
-      { icon: "⊕", label: "Connect Data", screen: "onboard" },
-    ],
-  },
-];
+const Sidebar = ({ activeScreen, onNavigate, mobileOpen, onClose, alertCount = 0, transferCount = 0 }: SidebarProps) => {
+  const navItems: {
+    section: string;
+    items: { icon: string; label: string; screen: ScreenName; badge?: string; badgeColor?: string }[];
+  }[] = [
+      {
+        section: "Overview",
+        items: [
+          { icon: "◈", label: "Dashboard", screen: "dashboard" },
+          {
+            icon: "⚡",
+            label: "Alerts",
+            screen: "alerts",
+            badge: alertCount > 0 ? String(alertCount) : undefined,
+          },
+        ],
+      },
+      {
+        section: "Manage",
+        items: [
+          { icon: "▦", label: "Stock Overview", screen: "inventory" },
+          { icon: "⇄", label: "Store Transfers", screen: "transfer", badge: transferCount > 0 ? String(transferCount) : undefined },
+          { icon: "∿", label: "Sales Forecast", screen: "forecast" },
+          { icon: "◎", label: "Vendors", screen: "suppliers", badge: "2", badgeColor: "warning" },
+        ],
+      },
+      {
+        section: "AI Working",
+        items: [
+          { icon: "⬡", label: "AI Agents", screen: "agents", badge: "3", badgeColor: "success" },
+          { icon: "✦", label: "WhatsApp Bot", screen: "whatsapp" },
+        ],
+      },
+      {
+        section: "Setup",
+        items: [
+          { icon: "⊕", label: "Connect Your Data", screen: "onboard" },
+        ],
+      },
+    ];
 
-const Sidebar = ({ activeScreen, onNavigate, mobileOpen, onClose }: SidebarProps) => {
   return (
     <>
-      {/* Mobile overlay */}
       {mobileOpen && (
         <div className="fixed inset-0 z-40 bg-foreground/20 md:hidden" onClick={onClose} />
       )}
@@ -68,20 +78,18 @@ const Sidebar = ({ activeScreen, onNavigate, mobileOpen, onClose }: SidebarProps
                 <button
                   key={item.screen}
                   onClick={() => onNavigate(item.screen)}
-                  className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[13px] transition-colors mb-0.5 ${
-                    activeScreen === item.screen
+                  className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[13px] transition-colors mb-0.5 ${activeScreen === item.screen
                       ? "bg-sidebar-accent text-primary font-medium border border-primary/20"
                       : "text-muted-foreground hover:bg-secondary hover:text-foreground"
-                  }`}
+                    }`}
                 >
                   <span className="w-5 text-center text-sm">{item.icon}</span>
                   <span>{item.label}</span>
                   {item.badge && (
-                    <span className={`ml-auto text-[9px] font-semibold px-1.5 py-0.5 rounded-full text-primary-foreground ${
-                      item.badgeColor === "success" ? "bg-success" :
-                      item.badgeColor === "warning" ? "bg-warning text-foreground" :
-                      "bg-primary"
-                    }`}>
+                    <span className={`ml-auto text-[9px] font-semibold px-1.5 py-0.5 rounded-full text-primary-foreground ${item.badgeColor === "success" ? "bg-success" :
+                        item.badgeColor === "warning" ? "bg-warning text-foreground" :
+                          "bg-primary"
+                      }`}>
                       {item.badge}
                     </span>
                   )}
@@ -91,10 +99,13 @@ const Sidebar = ({ activeScreen, onNavigate, mobileOpen, onClose }: SidebarProps
           ))}
         </nav>
 
-        <div className="border-t border-border p-4 text-[11px]">
-          <div className="text-muted-foreground/50 text-[10px] mb-1">AI Engine</div>
-          <div className="text-foreground font-medium">Claude 3.5 Sonnet</div>
-          <div className="text-muted-foreground mt-0.5">Powered by InvisibleCTO</div>
+        <div className="border-t border-border p-4">
+          <div className="flex items-center gap-1.5 mb-1">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-[9px] font-bold text-emerald-600 uppercase tracking-widest">AI Online</span>
+          </div>
+          <div className="text-foreground font-semibold text-[11px]">Claude 3.5 Sonnet</div>
+          <div className="text-muted-foreground/60 text-[10px] mt-0.5 leading-tight">Watching 47 stores · 24/7</div>
         </div>
       </aside>
     </>

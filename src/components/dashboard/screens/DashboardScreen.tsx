@@ -1,158 +1,267 @@
-import { Button } from "@/components/ui/button";
-import StatCard from "../shared/StatCard";
-import AlertItem from "../shared/AlertItem";
+import { motion, AnimatePresence } from "framer-motion";
+import { useApp } from "@/context/AppContext";
 import type { ScreenName } from "../DashboardLayout";
+import { INVENTORY_ITEMS } from "@/data/appData";
 
 interface Props {
-  onShowModal: () => void;
   onNavigate: (s: ScreenName) => void;
 }
 
-const DashboardScreen = ({ onShowModal, onNavigate }: Props) => (
-  <div>
-    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-7">
-      <div>
-        <h1 className="text-xl font-bold text-text-heading">Good morning, Ramesh ji 👋</h1>
-        <p className="text-sm text-muted-foreground mt-1">Tuesday, 8 Apr · 3 agents working across factory, EBOs & exports</p>
-      </div>
-      <div className="flex gap-2">
-        <Button variant="outline" size="sm" onClick={() => onNavigate("onboard")}>+ Connect Maplemonk</Button>
-        <Button size="sm" onClick={onShowModal}>📦 Raise PO</Button>
-      </div>
-    </div>
+const DashboardScreen = ({ onNavigate }: Props) => {
+  const { metrics, criticalAlerts, resolvedCount, openPOForItem, resolveAlert } = useApp();
 
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-      <StatCard
-        label="Inventory Value"
-        value="₹14.2Cr"
-        change="+₹46L WoW"
-        changeType="up"
-        color="success"
-        trend={[12.8, 13.1, 13.0, 13.4, 13.6, 13.9, 13.74, 14.2]}
-        hint="Across 6 DCs · 47 EBOs · 180 MBOs"
-        onClick={() => onNavigate("inventory")}
-      />
-      <StatCard
-        label="Size Breaks · Network"
-        value="142"
-        change="+38 vs yesterday"
-        changeType="down"
-        color="destructive"
-        trend={[64, 78, 88, 92, 104, 121, 104, 142]}
-        hint="89 EBOs · 53 MBOs need refill"
-        onClick={() => onNavigate("alerts")}
-      />
-      <StatCard
-        label="Aged Stock · 90d+"
-        value="₹2.1Cr"
-        change="14.7% of inventory locked"
-        changeType="warn"
-        color="warning"
-        trend={[1.6, 1.7, 1.75, 1.82, 1.9, 1.95, 2.04, 2.1]}
-        hint="86 styles · Junior + Boys lead"
-        onClick={() => onNavigate("inventory")}
-      />
-      <StatCard
-        label="Factory POs · MTD"
-        value="86"
-        change="41 auto-cut by AI"
-        changeType="up"
-        color="info"
-        trend={[42, 51, 58, 63, 69, 74, 80, 86]}
-        hint="Avg cycle 11.4d · OTIF 92%"
-        onClick={() => onNavigate("agents")}
-      />
-    </div>
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+  const date = new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long" });
 
-    <div className="grid lg:grid-cols-[1.5fr_1fr] gap-4">
-      {/* Alerts */}
-      <div className="bg-card rounded-xl border border-border shadow-card overflow-hidden">
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-border">
-          <h2 className="text-sm font-bold text-text-heading">⚡ AI Alerts — Action Required</h2>
-          <span className="text-xs text-muted-foreground">9 open · 3 critical</span>
-        </div>
-        <AlertItem icon="🚨" iconType="critical" title="MEN-PLO-NVY-M (Polo Tee · Navy · M) — Refill 47 EBOs in 2 days" desc="Avg DOH: 1.8 days · Daily sell-through: 312 pcs across 47 EBOs · Factory WIP: 1,800 pcs ready. Trigger transfer order from Ludhiana DC?" time="2m ago" actionLabel="Trigger STO →" onAction={onShowModal} />
-        <AlertItem icon="🚨" iconType="critical" title="WMN-KRTI-PNK-L (Printed Kurti · Pink · L) — Demand spike +62%" desc="Wedding-season carryover. AI recommends cutting fresh lot of 2,400 pcs (size-curve attached). Yarn available — 6 day lead." time="15m ago" actionLabel="Approve cut →" onAction={onShowModal} />
-        <AlertItem icon="⚠️" iconType="warning" title="Export Order #EXP-118 (Riyadh) — Fabric vendor 6 days late" desc="Mélange yarn lot from Tirupur supplier delayed. AI sent 3 WhatsApp follow-ups. Risk: shipment SLA breach by Apr 22 (LC penalty)." time="1h ago" actionLabel="Escalate vendor" onAction={onShowModal} />
-        <AlertItem icon="⚠️" iconType="warning" title="Aged-stock alert — JNR-GRPHX-YLW (Boys Graphic Tee Yellow)" desc="₹18.4L worth across 6 warehouses, 110+ days old · Sell-through 4 pcs/week. Suggest: EOSS push on EBOs + B2B liquidator route" time="3h ago" actionLabel="Plan markdown" onAction={onShowModal} />
-        <AlertItem icon="✅" iconType="success" title="Cut order CO-2244 confirmed — In-house Unit 2 (Ludhiana)" desc="4,800 pcs Round-Neck Tees (asst. sizes) · Fabric issued · Dispatch to DC: Apr 12 · ₹14,40,000" time="4h ago" actionLabel="View order" actionVariant="success" onAction={onShowModal} />
-      </div>
-
-      {/* Right column */}
-      <div className="space-y-4">
-        {/* Cash breakdown */}
-        <div className="bg-card rounded-xl border border-border shadow-card overflow-hidden">
-          <div className="px-5 py-3.5 border-b border-border">
-            <h2 className="text-sm font-bold text-text-heading">💰 Inventory Health</h2>
-          </div>
-          <div className="p-5 space-y-3">
-            <ProgressBar label="Best Sellers (0–60d)" value="₹9.4Cr" percent={66} color="bg-success" />
-            <ProgressBar label="Slow Movers (60–90d)" value="₹2.7Cr" percent={19} color="bg-warning" />
-            <ProgressBar label="Aged / Dead (90d+)" value="₹2.1Cr" percent={15} color="bg-destructive" />
-            <div className="mt-4 p-3 bg-primary/5 border border-primary/15 rounded-lg text-xs text-foreground leading-relaxed">
-              🤖 <strong>AI says:</strong> Liquidating aged Junior + Boys lines via EOSS this month frees up <span className="text-primary font-bold">₹2.1Cr</span> working capital — enough to pre-cut your AW'25 capsule before yarn prices rise.
-            </div>
-          </div>
-        </div>
-
-        {/* Forecast mini */}
-        <div className="bg-card rounded-xl border border-border shadow-card overflow-hidden">
-          <div className="flex items-center justify-between px-5 py-3.5 border-b border-border">
-            <h2 className="text-sm font-bold text-text-heading">📊 30-Day Sell-through</h2>
-            <div className="flex gap-3 text-[10px]">
-              <span className="text-info">■ Actual</span>
-              <span className="text-primary">⬚ Forecast</span>
-            </div>
-          </div>
-          <div className="p-5">
-            <ForecastChart />
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-);
-
-const ProgressBar = ({ label, value, percent, color }: { label: string; value: string; percent: number; color: string }) => (
-  <div>
-    <div className="flex justify-between text-xs mb-1.5">
-      <span className="text-muted-foreground">{label}</span>
-      <span className="font-medium text-foreground">{value}</span>
-    </div>
-    <div className="h-1.5 bg-secondary rounded-full overflow-hidden">
-      <div className={`h-full rounded-full ${color}`} style={{ width: `${percent}%` }} />
-    </div>
-  </div>
-);
-
-const ForecastChart = () => {
-  const data = [
-    { actual: 70 }, { actual: 85 }, { actual: 65 }, { actual: 90 },
-    { actual: 78 }, { actual: 95 }, { actual: 88 },
-    { forecast: 100 }, { forecast: 115 }, { forecast: 130 },
-  ];
-  const labels = ["Mar 1", "", "Mar 10", "", "Mar 20", "", "Apr 1", "", "Apr 10", ""];
-  const max = 130;
+  const statusLine = criticalAlerts.length === 0
+    ? "All clear — AI is handling everything in the background."
+    : `${criticalAlerts.length} item${criticalAlerts.length === 1 ? " needs" : "s need"} your call. The rest is taken care of.`;
 
   return (
-    <div>
-      <div className="flex items-end gap-1.5 h-28">
-        {data.map((d, i) => (
-          <div key={i} className="flex-1 flex items-end">
-            <div
-              className={`w-full rounded-t-sm transition-all ${
-                d.actual ? "bg-info/50" : "bg-primary/30 border border-dashed border-primary/50"
-              }`}
-              style={{ height: `${((d.actual || d.forecast || 0) / max) * 100}%` }}
-            />
-          </div>
+    <div className="space-y-8 max-w-5xl">
+
+      {/* ── Greeting ── */}
+      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+        <div>
+          <p className="text-xs text-muted-foreground mb-1 font-medium">{date}</p>
+          <h1 className="text-[26px] font-bold tracking-tight leading-tight">{greeting} 👋</h1>
+          <p className="text-muted-foreground text-sm mt-1">{statusLine}</p>
+        </div>
+        <motion.button
+          whileHover={{ scale: 1.03 }}
+          whileTap={{ scale: 0.97 }}
+          onClick={() => {
+            const urgent = INVENTORY_ITEMS.find(i => i.status === "critical");
+            if (urgent) openPOForItem(urgent);
+          }}
+          className="shrink-0 px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-semibold text-sm shadow-sm"
+        >
+          📦 Order Stock
+        </motion.button>
+      </div>
+
+      {/* ── 4 Stat Cards ── */}
+      <motion.div
+        className="grid grid-cols-2 lg:grid-cols-4 gap-3"
+        initial="hidden"
+        animate="show"
+        variants={{ hidden: {}, show: { transition: { staggerChildren: 0.07 } } }}
+      >
+        {[
+          {
+            label: "Your stock is worth",
+            value: metrics.totalInventory,
+            sub: "+₹46L added this month",
+            accent: "border-l-primary",
+            valueColor: "",
+            onClick: () => onNavigate("inventory"),
+          },
+          {
+            label: "Need attention now",
+            value: String(criticalAlerts.length),
+            sub: criticalAlerts.length > 0 ? "Act before sales are lost" : "Nothing urgent right now",
+            accent: criticalAlerts.length > 0 ? "border-l-red-500" : "border-l-emerald-500",
+            valueColor: criticalAlerts.length > 0 ? "text-red-600 dark:text-red-400" : "text-emerald-600",
+            onClick: () => onNavigate("alerts"),
+          },
+          {
+            label: "Sitting unsold",
+            value: metrics.oldStockValue,
+            sub: `${metrics.oldStockPercent} of your inventory`,
+            accent: "border-l-amber-500",
+            valueColor: "text-amber-600",
+            onClick: () => onNavigate("inventory"),
+          },
+          {
+            label: "Handled this month",
+            value: String(metrics.ordersThisMonth),
+            sub: `${metrics.autoProcessed} done by AI for you`,
+            accent: "border-l-emerald-500",
+            valueColor: "text-emerald-600",
+            onClick: () => onNavigate("agents"),
+          },
+        ].map((card) => (
+          <motion.div
+            key={card.label}
+            variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { duration: 0.35 } } }}
+            whileHover={{ y: -2 }}
+            onClick={card.onClick}
+            className={`bg-card border border-border border-l-4 ${card.accent} rounded-xl p-4 cursor-pointer hover:shadow-md transition-all`}
+          >
+            <p className="text-xs text-muted-foreground mb-2 font-medium">{card.label}</p>
+            <p className={`text-2xl font-bold tracking-tight mb-1 ${card.valueColor}`}>{card.value}</p>
+            <p className="text-[11px] text-muted-foreground">{card.sub}</p>
+          </motion.div>
         ))}
+      </motion.div>
+
+      {/* ── Priorities ── */}
+      <AnimatePresence>
+        {criticalAlerts.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4 }}
+          >
+            <div className="flex items-center gap-2 mb-4">
+              <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse shrink-0" />
+              <h2 className="text-base font-semibold">Needs your decision today</h2>
+              <span className="text-xs text-muted-foreground">— {criticalAlerts.length} item{criticalAlerts.length > 1 ? "s" : ""}</span>
+            </div>
+
+            <div className="space-y-3">
+              {criticalAlerts.slice(0, 2).map((alert, i) => {
+                const linkedItem = INVENTORY_ITEMS.find(it => it.id === alert.linkedItemId);
+                return (
+                  <motion.div
+                    key={alert.id}
+                    initial={{ opacity: 0, x: -16 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.08, duration: 0.35 }}
+                    className="bg-card rounded-xl border border-border hover:border-primary/20 p-5 transition-colors"
+                  >
+                    <div className="flex items-start gap-4">
+                      <span className="text-2xl shrink-0 mt-0.5">{alert.icon}</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h3 className="font-semibold text-foreground text-sm">{alert.title}</h3>
+                          <span className="text-[10px] font-bold text-red-600 bg-red-50 dark:bg-red-950/30 px-1.5 py-0.5 rounded-md">
+                            {alert.moneyAtRisk} at risk
+                          </span>
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-3 leading-relaxed">{alert.details}</p>
+                        <div className="flex flex-wrap gap-2">
+                          <motion.button
+                            whileHover={{ scale: 1.03 }}
+                            whileTap={{ scale: 0.97 }}
+                            onClick={() => linkedItem ? openPOForItem(linkedItem) : resolveAlert(alert.id, `✅ ${alert.action} done!`)}
+                            className="px-3.5 py-1.5 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-semibold text-xs transition-colors"
+                          >
+                            {alert.action} →
+                          </motion.button>
+                          <motion.button
+                            whileHover={{ scale: 1.03 }}
+                            whileTap={{ scale: 0.97 }}
+                            onClick={() => resolveAlert(alert.id, "Got it — AI will remind you tomorrow.")}
+                            className="px-3.5 py-1.5 bg-muted hover:bg-muted/80 text-muted-foreground rounded-lg text-xs transition-colors"
+                          >
+                            Remind me tomorrow
+                          </motion.button>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── Good News ── */}
+      <AnimatePresence>
+        {resolvedCount > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4 }}
+            className="flex items-start gap-4 bg-emerald-50/60 dark:bg-emerald-950/10 border border-emerald-200 dark:border-emerald-800/50 rounded-xl px-5 py-4"
+          >
+            <span className="text-2xl shrink-0">🤖</span>
+            <div>
+              <p className="font-semibold text-emerald-700 dark:text-emerald-400 text-sm">
+                AI sorted {resolvedCount} problem{resolvedCount > 1 ? "s" : ""} while you were away
+              </p>
+              <p className="text-sm text-muted-foreground mt-0.5">
+                Round-neck tees — 4,800 pieces ordered and arriving April 12. Nothing for you to do.
+              </p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── Stock Health + Action List ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.15 }}
+          className="bg-card rounded-xl border border-border p-5"
+        >
+          <h3 className="font-semibold text-sm mb-0.5">Where your money is sitting</h3>
+          <p className="text-xs text-muted-foreground mb-5">Breakdown of all {metrics.totalInventory} in stock</p>
+          <div className="space-y-5">
+            <HealthBar label="Selling well" value={metrics.freshStockValue} percent={metrics.freshStockPercent} color="bg-emerald-500" dotColor="bg-emerald-500" desc="People are actively buying this" />
+            <HealthBar label="Moving slowly" value={metrics.slowStockValue} percent={metrics.slowStockPercent} color="bg-amber-400" dotColor="bg-amber-400" desc="Not selling as fast as expected" />
+            <HealthBar label="Stuck for 90+ days" value={metrics.deadStockValue} percent={metrics.deadStockPercent} color="bg-red-400" dotColor="bg-red-400" desc="Needs a clearance sale to free up cash" />
+          </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.2 }}
+          className="bg-card rounded-xl border border-border p-5"
+        >
+          <h3 className="font-semibold text-sm mb-0.5">Your to-do list</h3>
+          <p className="text-xs text-muted-foreground mb-5">3 things that protect your business today</p>
+          <ul className="space-y-4">
+            {criticalAlerts.slice(0, 2).map((alert, i) => (
+              <li key={alert.id} className="flex gap-3 items-start">
+                <span className="h-5 w-5 rounded-full bg-red-100 dark:bg-red-950/30 text-red-600 text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">{i + 1}</span>
+                <div>
+                  <p className="text-sm font-medium">{alert.title}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{alert.action}</p>
+                </div>
+              </li>
+            ))}
+            <li className="flex gap-3 items-start">
+              <span className="h-5 w-5 rounded-full bg-amber-100 dark:bg-amber-950/30 text-amber-600 text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">₹</span>
+              <div>
+                <p className="text-sm font-medium">Free up {metrics.oldStockValue} in cash</p>
+                <p className="text-xs text-muted-foreground mt-0.5">Run a clearance sale on old stock — AI can plan it for you</p>
+              </div>
+            </li>
+            <li className="flex gap-3 items-start">
+              <span className="h-5 w-5 rounded-full bg-emerald-100 dark:bg-emerald-950/30 text-emerald-600 text-[11px] font-bold flex items-center justify-center shrink-0 mt-0.5">✓</span>
+              <div>
+                <p className="text-sm font-medium text-emerald-700 dark:text-emerald-400">{metrics.forecastAccuracy} forecast accuracy</p>
+                <p className="text-xs text-muted-foreground mt-0.5">AI is getting better at predicting your sales</p>
+              </div>
+            </li>
+          </ul>
+        </motion.div>
       </div>
-      <div className="flex justify-between mt-2 text-[10px] text-muted-foreground/60">
-        {labels.map((l, i) => <span key={i}>{l}</span>)}
-      </div>
+
     </div>
   );
 };
+
+const HealthBar = ({ label, value, percent, color, dotColor, desc }: {
+  label: string; value: string; percent: number; color: string; dotColor: string; desc: string;
+}) => (
+  <div>
+    <div className="flex items-center justify-between mb-2">
+      <div className="flex items-center gap-2">
+        <span className={`h-2 w-2 rounded-full shrink-0 ${dotColor}`} />
+        <span className="text-sm font-medium">{label}</span>
+      </div>
+      <span className="text-sm font-bold">{value}</span>
+    </div>
+    <div className="h-1.5 bg-secondary rounded-full overflow-hidden mb-1">
+      <motion.div
+        initial={{ width: 0 }}
+        animate={{ width: `${percent}%` }}
+        transition={{ duration: 1, ease: "easeOut" }}
+        className={`h-full rounded-full ${color}`}
+      />
+    </div>
+    <p className="text-[11px] text-muted-foreground">{desc}</p>
+  </div>
+);
 
 export default DashboardScreen;

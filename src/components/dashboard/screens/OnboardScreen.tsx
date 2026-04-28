@@ -29,7 +29,7 @@ const OnboardScreen = () => {
 
       <div className="max-w-2xl mx-auto">
         <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3">Step 1 — Connect Your Software</h3>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mb-8">
           {connectors.map((c, i) => (
             <button
               key={c.name}

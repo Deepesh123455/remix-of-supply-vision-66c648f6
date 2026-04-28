@@ -16,11 +16,11 @@ const agents = [
   },
   {
     avatar: "📊", name: "Forecast & Buying Agent",
-    status: "Running · Retraining on Apr sell-through across India + GCC",
+    status: "Running · Retraining on Apr sell-through across PAN India stores",
     meta: "91.4% accuracy · Updated daily",
     logs: [
       { time: "05:00", type: "CHECK", typeColor: "text-info", text: "Pulling 90 days sell-through from Maplemonk + EasyEcom + EBO POS feeds..." },
-      { time: "05:02", type: "CHECK", typeColor: "text-info", text: "Cross-referencing returns, size-curve drift, wedding/Eid calendar, GCC weather..." },
+      { time: "05:02", type: "CHECK", typeColor: "text-info", text: "Cross-referencing returns, size-curve drift, wedding/Eid calendar, regional seasonal demand..." },
       { time: "05:08", type: "ACTION", typeColor: "text-primary", text: "Detected Eid in 18 days + wedding peak in 12 days. Multiplier applied to 14 ethnic + festive styles." },
       { time: "05:12", type: "DONE", typeColor: "text-success", text: "Forecast updated. Printed Kurti Pink flagged as high-confidence spike. Sherwani-style Kurta added to watch list." },
       { time: "05:14", type: "ACTION", typeColor: "text-primary", text: "Tirupur cotton-mélange yarn rising +8% wholesale. Flagged for immediate fabric pre-buy before AW'25 sampling." },
@@ -28,14 +28,14 @@ const agents = [
     ],
   },
   {
-    avatar: "🤝", name: "Vendor & Export Follow-up Agent",
-    status: "Running · Monitoring 18 open POs + 4 export shipments",
+    avatar: "🤝", name: "Vendor & Order Follow-up Agent",
+    status: "Running · Monitoring 18 open POs + 4 inter-city bulk shipments",
     meta: "5 follow-ups sent today",
     logs: [
-      { time: "08:00", type: "CHECK", typeColor: "text-info", text: "Checking lot status across 18 open POs (yarn, print, CMT) + 4 GCC export shipments..." },
+      { time: "08:00", type: "CHECK", typeColor: "text-info", text: "Checking lot status across 18 open POs (yarn, print, CMT) + 4 inter-city bulk shipments to franchise stores..." },
       { time: "08:01", type: "ALERT", typeColor: "text-warning", text: "Lot #PR-2041 (Punjab Print House, sublimation) — Expected Apr 4. Now Apr 10. 6 days late." },
       { time: "08:02", type: "ACTION", typeColor: "text-primary", text: 'Sending WhatsApp follow-up to Punjab Print House (+91-98765-11230): "Lot #PR-2041 dispatch ETA?"' },
-      { time: "08:04", type: "ALERT", typeColor: "text-warning", text: "Export Order #EXP-118 (Riyadh) — Tirupur fabric vendor missed dispatch. LC SLA at risk Apr 22." },
+      { time: "08:04", type: "ALERT", typeColor: "text-warning", text: "Bulk Order #BLK-118 (Indore franchise) — Tirupur fabric vendor missed dispatch. Delivery SLA at risk Apr 22." },
       { time: "10:02", type: "ACTION", typeColor: "text-primary", text: "No response from Punjab Print House after 2 hours. Sending second WhatsApp + email. Flagging for human escalation." },
       { time: "11:30", type: "ALERT", typeColor: "text-warning", text: "Suggesting alternate sublimation vendor: Sonipat Print Co. (96 reliability score). Raising alert on dashboard." },
     ],
@@ -46,7 +46,7 @@ const AgentsScreen = () => (
   <div>
     <div className="mb-7">
       <h1 className="text-xl font-bold text-text-heading">⬡ Active AI Agents</h1>
-      <p className="text-sm text-muted-foreground mt-1">Autonomous agents running 24/7 across factory, DCs, EBOs, MBOs & exports</p>
+      <p className="text-sm text-muted-foreground mt-1">Autonomous agents running 24/7 across factories, DCs, EBOs, MBOs & franchise partners</p>
     </div>
 
     <div className="space-y-4">
@@ -68,7 +68,7 @@ const AgentsScreen = () => (
               <div key={i} className="flex gap-2.5 py-1 animate-in fade-in duration-300" style={{ animationDelay: `${i * 100}ms` }}>
                 <span className="text-muted-foreground/40 w-10 shrink-0">{log.time}</span>
                 <span className={`${log.typeColor} w-14 shrink-0 font-semibold`}>{log.type}</span>
-                <span className="text-foreground/80">{log.text}</span>
+                <span className="text-foreground/80 flex-1 min-w-0 break-words">{log.text}</span>
               </div>
             ))}
           </div>

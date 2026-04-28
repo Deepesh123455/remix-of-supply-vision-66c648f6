@@ -1,49 +1,202 @@
 import { useState } from "react";
-import StatCard from "../shared/StatCard";
-import AlertItem from "../shared/AlertItem";
+import { motion, AnimatePresence } from "framer-motion";
+import { useApp } from "@/context/AppContext";
+import { INVENTORY_ITEMS } from "@/data/appData";
 
-type Filter = "all" | "critical" | "warning" | "resolved" | "auto";
+type Filter = "critical" | "warning" | "all";
 
-const AlertsScreen = ({ onShowModal }: { onShowModal: () => void }) => {
-  const [filter, setFilter] = useState<Filter>("all");
+const containerVariants = {
+  hidden: { opacity: 0 },
+  show: { opacity: 1, transition: { staggerChildren: 0.1 } },
+};
 
-  const alerts = [
-    { kind: "critical", node: <AlertItem icon="🚨" iconType="critical" title="CRITICAL · Polo Navy (M) — 47 EBOs at zero in 2 days" desc="Network stock: 560 pcs · Sell-through: 312/day · DC has 1,800 pcs ready · STO not raised. Triggering now will refill 41 of 47 EBOs." badge="CRITICAL" badgeType="critical" actionLabel="Trigger STO" onAction={onShowModal} /> },
-    { kind: "critical", node: <AlertItem icon="🚨" iconType="critical" title="CRITICAL · Printed Kurti Pink (L) — Demand spike +62% (wedding carryover)" desc="Pattern matched from 2024 Apr–May curve. AI recommends cut order of 2,400 pcs (size-curve attached). Mélange yarn in stock." badge="CRITICAL" badgeType="critical" actionLabel="Approve cut" onAction={onShowModal} /> },
-    { kind: "critical", node: <AlertItem icon="🚨" iconType="critical" title="CRITICAL · Crew Sweatshirt Grey (L) — 1 day cover · 12 EBOs out" desc="120 pcs left across network. Pre-AW'25 buyers asking — every stockout day = ₹2.4L lost EBO revenue + brand perception hit." badge="CRITICAL" badgeType="critical" actionLabel="Auto-cut" onAction={onShowModal} /> },
-    { kind: "warning", node: <AlertItem icon="⚠️" iconType="warning" title="WARNING · Export Order #EXP-118 (Riyadh) — Fabric vendor 6 days late" desc="Tirupur mélange supplier missed lot dispatch. AI sent 3 WhatsApp follow-ups. LC SLA penalty kicks in Apr 22 if not shipped." badge="LATE" badgeType="warning" actionLabel="Escalate" onAction={onShowModal} /> },
-    { kind: "warning", node: <AlertItem icon="⚠️" iconType="warning" title="WARNING · ₹2.1Cr aged inventory — Junior + Boys lines" desc="86 styles haven't moved in 90+ days across 6 warehouses. AI suggests EOSS markdown across EBOs + B2B liquidator route." badge="CASH" badgeType="warning" actionLabel="View list" onAction={onShowModal} /> },
-    { kind: "warning", node: <AlertItem icon="⚠️" iconType="warning" title="WARNING · GCC export demand softening — Riyadh & Dubai EBOs" desc="Sell-through down 14% MoM in Saudi & UAE EBOs for Men's casuals. AI recommends pausing next replenishment cycle, re-mixing assortment." badge="CHANNEL" badgeType="warning" actionLabel="Review mix" onAction={onShowModal} /> },
-    { kind: "auto", node: <AlertItem icon="ℹ️" iconType="info" title="INFO · AW'25 capsule buying plan ready (132 styles)" desc="AI built the buying plan from last 2 winters' sell-through, returns, and Punjab + GCC weather forecasts. Review before Apr 30." badge="PLAN" badgeType="success" actionLabel="Review plan" actionVariant="success" onAction={onShowModal} /> },
-    { kind: "resolved", node: <AlertItem icon="✅" iconType="success" title="RESOLVED · Cut order CO-2244 (Unit 2 Ludhiana) confirmed for Apr 12" desc="Agent auto-confirmed fabric issue + line allocation. 4,800 pcs Round-Neck Tees. GRN auto-logs into DC on dispatch." badge="DONE" badgeType="success" /> },
-  ];
+const itemVariants = {
+  hidden: { opacity: 0, x: -20 },
+  show: { opacity: 1, x: 0, transition: { duration: 0.4 } },
+};
 
-  const visible = filter === "all" ? alerts : alerts.filter(a => a.kind === filter);
-  const labels: Record<Filter, string> = { all: "All", critical: "Critical", warning: "Warnings", resolved: "Resolved", auto: "Auto-resolved" };
+const AlertsScreen = () => {
+  const [filter, setFilter] = useState<Filter>("critical");
+  const { criticalAlerts, warningAlerts, resolvedCount, resolveAlert, resolveWarning, openPOForItem } = useApp();
 
   return (
     <div>
-      <div className="mb-7">
-        <h1 className="text-xl font-bold text-text-heading">⚡ AI Alerts</h1>
-        <p className="text-sm text-muted-foreground mt-1">Live signals across factory, DCs, EBOs, MBOs & export orders</p>
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold tracking-tight">Action Center</h1>
+        <p className="text-muted-foreground text-sm mt-0.5">Problems found before they cost you money — sorted by what hurts most.</p>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <StatCard label="Critical" value="3" change="+1 in last hour" changeType="down" color="destructive" trend={[1,2,2,3,2,3,3,3]} hint="Refill, cut, export risk" onClick={() => setFilter("critical")} />
-        <StatCard label="Warnings" value="6" change="2 awaiting vendor reply" changeType="warn" color="warning" trend={[4,5,5,6,5,6,6,6]} hint="Fabric, channel, aging" onClick={() => setFilter("warning")} />
-        <StatCard label="Resolved Today" value="14" change="vs 9 yesterday" changeType="up" color="success" trend={[6,8,9,11,12,13,13,14]} hint="STOs, COs, vendor follow-ups" onClick={() => setFilter("resolved")} />
-        <StatCard label="Auto-resolved by AI" value="9" change="64% closure rate" changeType="up" color="info" trend={[3,4,5,6,7,8,8,9]} hint="No human in loop" onClick={() => setFilter("auto")} />
-      </div>
-
-      <div className="bg-card rounded-xl border border-border shadow-card overflow-hidden">
-        <div className="px-5 py-3.5 border-b border-border flex items-center justify-between gap-3 flex-wrap">
-          <h2 className="text-sm font-bold text-text-heading">{labels[filter]} Alerts <span className="text-muted-foreground font-normal">· {visible.length}</span></h2>
-          {filter !== "all" && (
-            <button onClick={() => setFilter("all")} className="text-xs text-primary hover:underline">Clear filter</button>
-          )}
+      {/* Quiet summary strip */}
+      <motion.div
+        className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm py-1 mb-4"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.4 }}
+      >
+        <button onClick={() => setFilter("critical")} className={`flex items-center gap-2 transition-colors ${filter === "critical" ? "text-foreground font-semibold" : "text-muted-foreground hover:text-foreground"}`}>
+          <div className="h-2 w-2 rounded-full bg-red-500 shrink-0" />
+          <span>{criticalAlerts.length} urgent</span>
+        </button>
+        <div className="h-1 w-1 rounded-full bg-border hidden sm:block" />
+        <button onClick={() => setFilter("warning")} className={`flex items-center gap-2 transition-colors ${filter === "warning" ? "text-foreground font-semibold" : "text-muted-foreground hover:text-foreground"}`}>
+          <div className="h-2 w-2 rounded-full bg-amber-400 shrink-0" />
+          <span>{warningAlerts.length} to watch</span>
+        </button>
+        <div className="h-1 w-1 rounded-full bg-border hidden sm:block" />
+        <div className="flex items-center gap-2 text-muted-foreground">
+          <div className="h-2 w-2 rounded-full bg-emerald-500 shrink-0" />
+          <span>{resolvedCount} handled by AI today</span>
         </div>
-        {visible.map((a, i) => <div key={i}>{a.node}</div>)}
+      </motion.div>
+
+      {/* Filter Tabs */}
+      <div className="flex flex-wrap gap-1.5 mb-6">
+        {[
+          { id: "critical" as Filter, label: `Urgent (${criticalAlerts.length})` },
+          { id: "warning" as Filter, label: `Watch (${warningAlerts.length})` },
+          { id: "all" as Filter, label: `All (${criticalAlerts.length + warningAlerts.length})` },
+        ].map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => setFilter(tab.id)}
+            className={`px-3.5 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+              filter === tab.id
+                ? "bg-foreground text-background"
+                : "bg-muted text-muted-foreground hover:bg-muted/80"
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
+
+      {/* Critical Alerts */}
+      <AnimatePresence>
+        {(filter === "critical" || filter === "all") && criticalAlerts.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            className="mb-6"
+          >
+            <h2 className="text-sm font-semibold text-muted-foreground mb-3 flex items-center gap-2">
+                <span className="h-1.5 w-1.5 rounded-full bg-red-500" /> Urgent — act on these today
+              </h2>
+            <motion.div className="space-y-3" variants={containerVariants} initial="hidden" animate="show">
+              {criticalAlerts.map((alert) => {
+                const linkedItem = INVENTORY_ITEMS.find(it => it.id === alert.linkedItemId);
+                return (
+                  <motion.div
+                    key={alert.id}
+                    variants={itemVariants}
+                    layout
+                    exit={{ opacity: 0, x: -40, height: 0 }}
+                    className="bg-card border border-border hover:border-primary/20 rounded-xl p-5 transition-colors"
+                  >
+                    <div className="flex items-start gap-4">
+                      <span className="text-2xl shrink-0 mt-0.5">{alert.icon}</span>
+                      <div className="flex-1">
+                        <div className="flex items-start justify-between gap-2 mb-1">
+                          <h3 className="font-semibold text-foreground text-sm">{alert.title}</h3>
+                          <span className="text-[10px] font-bold text-red-600 bg-red-50 dark:bg-red-950/30 px-1.5 py-0.5 rounded-md shrink-0">{alert.moneyAtRisk} at risk</span>
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-3 leading-relaxed">{alert.details}</p>
+                        <div className="flex flex-wrap gap-2">
+                          <motion.button
+                            whileHover={{ scale: 1.03 }}
+                            whileTap={{ scale: 0.97 }}
+                            onClick={() => linkedItem ? openPOForItem(linkedItem) : resolveAlert(alert.id, `${alert.action} done!`)}
+                            className="px-3.5 py-1.5 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-semibold text-xs transition-colors"
+                          >
+                            {alert.action} →
+                          </motion.button>
+                          <motion.button
+                            whileHover={{ scale: 1.03 }}
+                            whileTap={{ scale: 0.97 }}
+                            onClick={() => resolveAlert(alert.id, "Got it — AI will remind you tomorrow.")}
+                            className="px-3.5 py-1.5 bg-muted hover:bg-muted/80 text-muted-foreground rounded-lg text-xs transition-colors"
+                          >
+                            Remind me tomorrow
+                          </motion.button>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {criticalAlerts.length === 0 && (filter === "critical" || filter === "all") && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="mb-6 flex items-center gap-3 bg-emerald-50/60 dark:bg-emerald-950/10 border border-emerald-200 dark:border-emerald-800/50 rounded-xl px-5 py-4"
+        >
+          <span className="text-xl">✅</span>
+          <div>
+            <p className="font-semibold text-emerald-700 dark:text-emerald-400 text-sm">Nothing urgent right now</p>
+            <p className="text-xs text-muted-foreground mt-0.5">All critical problems have been handled. AI is watching for new ones.</p>
+          </div>
+        </motion.div>
+      )}
+
+      {/* Warnings */}
+      <AnimatePresence>
+        {(filter === "warning" || filter === "all") && warningAlerts.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+          >
+            <h2 className="text-sm font-semibold text-muted-foreground mb-3 flex items-center gap-2">
+                <span className="h-1.5 w-1.5 rounded-full bg-amber-400" /> Keep an eye on these
+              </h2>
+            <motion.div className="space-y-3" variants={containerVariants} initial="hidden" animate="show">
+              {warningAlerts.map((alert) => (
+                <motion.div
+                  key={alert.id}
+                  variants={itemVariants}
+                  layout
+                  exit={{ opacity: 0, x: -40, height: 0 }}
+                  className="bg-card border border-border hover:border-amber-200 dark:hover:border-amber-800 rounded-xl p-5 transition-colors"
+                >
+                  <div className="flex items-start gap-4">
+                    <span className="text-2xl shrink-0 mt-0.5">{alert.icon}</span>
+                    <div className="flex-1">
+                      <div className="flex items-start justify-between gap-2 mb-1">
+                        <h3 className="font-semibold text-foreground text-sm">{alert.title}</h3>
+                        <span className="text-[10px] font-bold text-amber-600 bg-amber-50 dark:bg-amber-950/30 px-1.5 py-0.5 rounded-md shrink-0">{alert.moneyAtRisk}</span>
+                      </div>
+                      <p className="text-sm text-muted-foreground mb-3 leading-relaxed">{alert.details}</p>
+                      <div className="flex flex-wrap gap-2">
+                        <motion.button
+                          whileHover={{ scale: 1.03 }}
+                          whileTap={{ scale: 0.97 }}
+                          onClick={() => resolveWarning(alert.id, `${alert.action} done!`)}
+                          className="px-3.5 py-1.5 bg-foreground hover:bg-foreground/90 text-background rounded-lg font-semibold text-xs transition-colors"
+                        >
+                          {alert.action} →
+                        </motion.button>
+                        <motion.button
+                          whileHover={{ scale: 1.03 }}
+                          whileTap={{ scale: 0.97 }}
+                          onClick={() => resolveWarning(alert.id, "Noted — AI will keep monitoring.")}
+                          className="px-3.5 py-1.5 bg-muted hover:bg-muted/80 text-muted-foreground rounded-lg text-xs transition-colors"
+                        >
+                          I know, keep watching
+                        </motion.button>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
