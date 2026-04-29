@@ -19,7 +19,7 @@ const DashboardScreen = ({ onNavigate }: Props) => {
     : `${criticalAlerts.length} item${criticalAlerts.length === 1 ? " needs" : "s need"} your call. The rest is taken care of.`;
 
   return (
-    <div className="space-y-8 max-w-5xl">
+    <div className="space-y-6 max-w-5xl">
 
       {/* ── Greeting ── */}
       <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
@@ -52,7 +52,7 @@ const DashboardScreen = ({ onNavigate }: Props) => {
           {
             label: "Your stock is worth",
             value: metrics.totalInventory,
-            sub: "+₹46L added this month",
+            sub: "+₹4.6 L added this month",
             accent: "border-l-primary",
             valueColor: "",
             onClick: () => onNavigate("inventory"),
@@ -61,8 +61,8 @@ const DashboardScreen = ({ onNavigate }: Props) => {
             label: "Need attention now",
             value: String(criticalAlerts.length),
             sub: criticalAlerts.length > 0 ? "Act before sales are lost" : "Nothing urgent right now",
-            accent: criticalAlerts.length > 0 ? "border-l-red-500" : "border-l-emerald-500",
-            valueColor: criticalAlerts.length > 0 ? "text-red-600 dark:text-red-400" : "text-emerald-600",
+            accent: criticalAlerts.length > 0 ? "border-l-orange-500" : "border-l-emerald-500",
+            valueColor: criticalAlerts.length > 0 ? "text-orange-600 dark:text-orange-400" : "text-emerald-600",
             onClick: () => onNavigate("alerts"),
           },
           {
@@ -87,10 +87,10 @@ const DashboardScreen = ({ onNavigate }: Props) => {
             variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { duration: 0.35 } } }}
             whileHover={{ y: -2 }}
             onClick={card.onClick}
-            className={`bg-card border border-border border-l-4 ${card.accent} rounded-xl p-4 cursor-pointer hover:shadow-md transition-all`}
+            className={`bg-card border border-border border-l-4 ${card.accent} rounded-xl p-4 cursor-pointer hover:shadow-sm transition-all`}
           >
-            <p className="text-xs text-muted-foreground mb-2 font-medium">{card.label}</p>
-            <p className={`text-2xl font-bold tracking-tight mb-1 ${card.valueColor}`}>{card.value}</p>
+            <p className="text-[11px] text-muted-foreground mb-2 font-medium uppercase tracking-wide">{card.label}</p>
+            <p className={`text-xl font-bold tracking-tight mb-1 ${card.valueColor}`}>{card.value}</p>
             <p className="text-[11px] text-muted-foreground">{card.sub}</p>
           </motion.div>
         ))}
@@ -106,13 +106,13 @@ const DashboardScreen = ({ onNavigate }: Props) => {
             transition={{ duration: 0.4 }}
           >
             <div className="flex items-center gap-2 mb-4">
-              <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse shrink-0" />
+              <span className="h-2 w-2 rounded-full bg-orange-500 animate-pulse shrink-0" />
               <h2 className="text-base font-semibold">Needs your decision today</h2>
               <span className="text-xs text-muted-foreground">— {criticalAlerts.length} item{criticalAlerts.length > 1 ? "s" : ""}</span>
             </div>
 
             <div className="space-y-3">
-              {criticalAlerts.slice(0, 2).map((alert, i) => {
+              {criticalAlerts.map((alert, i) => {
                 const linkedItem = INVENTORY_ITEMS.find(it => it.id === alert.linkedItemId);
                 return (
                   <motion.div
@@ -120,14 +120,14 @@ const DashboardScreen = ({ onNavigate }: Props) => {
                     initial={{ opacity: 0, x: -16 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.08, duration: 0.35 }}
-                    className="bg-card rounded-xl border border-border hover:border-primary/20 p-5 transition-colors"
+                    className="bg-card rounded-xl border border-border hover:border-primary/20 p-4 transition-colors"
                   >
                     <div className="flex items-start gap-4">
                       <span className="text-2xl shrink-0 mt-0.5">{alert.icon}</span>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
                           <h3 className="font-semibold text-foreground text-sm">{alert.title}</h3>
-                          <span className="text-[10px] font-bold text-red-600 bg-red-50 dark:bg-red-950/30 px-1.5 py-0.5 rounded-md">
+                          <span className="text-[10px] font-bold text-orange-600 bg-orange-50 dark:bg-orange-950/30 px-1.5 py-0.5 rounded-md">
                             {alert.moneyAtRisk} at risk
                           </span>
                         </div>
@@ -193,11 +193,11 @@ const DashboardScreen = ({ onNavigate }: Props) => {
           className="bg-card rounded-xl border border-border p-5"
         >
           <h3 className="font-semibold text-sm mb-0.5">Where your money is sitting</h3>
-          <p className="text-xs text-muted-foreground mb-5">Breakdown of all {metrics.totalInventory} in stock</p>
-          <div className="space-y-5">
-            <HealthBar label="Selling well" value={metrics.freshStockValue} percent={metrics.freshStockPercent} color="bg-emerald-500" dotColor="bg-emerald-500" desc="People are actively buying this" />
-            <HealthBar label="Moving slowly" value={metrics.slowStockValue} percent={metrics.slowStockPercent} color="bg-amber-400" dotColor="bg-amber-400" desc="Not selling as fast as expected" />
-            <HealthBar label="Stuck for 90+ days" value={metrics.deadStockValue} percent={metrics.deadStockPercent} color="bg-red-400" dotColor="bg-red-400" desc="Needs a clearance sale to free up cash" />
+          <p className="text-xs text-muted-foreground mb-4">Breakdown of {metrics.totalInventory} total stock</p>
+          <div className="space-y-4">
+            <HealthBar label="Selling well" value={metrics.freshStockValue} percent={metrics.freshStockPercent} color="bg-emerald-500" dotColor="bg-emerald-500" desc="Actively moving" />
+            <HealthBar label="Moving slowly" value={metrics.slowStockValue} percent={metrics.slowStockPercent} color="bg-amber-400" dotColor="bg-amber-400" desc="Below expected pace" />
+            <HealthBar label="Stuck 90+ days" value={metrics.deadStockValue} percent={metrics.deadStockPercent} color="bg-orange-400" dotColor="bg-orange-400" desc="Run clearance to free cash" />
           </div>
         </motion.div>
 
@@ -208,11 +208,11 @@ const DashboardScreen = ({ onNavigate }: Props) => {
           className="bg-card rounded-xl border border-border p-5"
         >
           <h3 className="font-semibold text-sm mb-0.5">Your to-do list</h3>
-          <p className="text-xs text-muted-foreground mb-5">3 things that protect your business today</p>
+          <p className="text-xs text-muted-foreground mb-4">Protect your business today</p>
           <ul className="space-y-4">
-            {criticalAlerts.slice(0, 2).map((alert, i) => (
+            {criticalAlerts.map((alert, i) => (
               <li key={alert.id} className="flex gap-3 items-start">
-                <span className="h-5 w-5 rounded-full bg-red-100 dark:bg-red-950/30 text-red-600 text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">{i + 1}</span>
+                <span className="h-5 w-5 rounded-full bg-orange-100 dark:bg-orange-950/30 text-orange-600 text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">{i + 1}</span>
                 <div>
                   <p className="text-sm font-medium">{alert.title}</p>
                   <p className="text-xs text-muted-foreground mt-0.5">{alert.action}</p>

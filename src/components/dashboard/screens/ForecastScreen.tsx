@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   TrendingUp, Target, Wallet, Sparkles, ArrowUpRight,
-  Download, Calendar, Search, Lightbulb, Cpu, History
+  Download, Calendar, Search, Lightbulb, Cpu, History,
+  X, CheckCircle2, ShoppingBag, Clock
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -15,12 +16,45 @@ import {
 } from "recharts";
 import { toast } from "sonner";
 import { FORECAST_ITEMS, CHART_DATA, METRICS } from "@/data/appData";
+import { useApp } from "@/context/AppContext";
 
 const RANGE_LABELS: Record<string, string> = { "7": "7 Days", "30": "30 Days", "90": "90 Days" };
 
+interface InsightItem {
+  icon: React.ReactNode;
+  title: string;
+  desc: string;
+  action: string;
+}
+
+
+const INSIGHT_ITEMS: InsightItem[] = [
+  {
+    icon: <Sparkles className="w-3 h-3 text-purple-500" />,
+    title: "Eid + Wedding Season Starting Soon",
+    desc: "Big demand coming in 12 days. Ethnic wear sales may go up 2.8x. Stock up now!",
+    action: "Plan Orders",
+  },
+  {
+    icon: <TrendingUp className="w-3 h-3 text-emerald-500" />,
+    title: "Fabric Prices Going Up",
+    desc: "Cotton yarn prices in Tirupur rising 8%. Buy fabric now before it gets more expensive.",
+    action: "Order Fabric",
+  },
+  {
+    icon: <Lightbulb className="w-3 h-3 text-blue-500" />,
+    title: "East India Demand Growing",
+    desc: "Kolkata & Bhubaneswar stores selling 38% more ethnic styles. Consider sending more of these.",
+    action: "See Details",
+  },
+];
+
 const ForecastScreen = () => {
+  const { placeInsightOrder, insightOrders } = useApp();
   const [activeRange, setActiveRange] = useState("30");
   const [search, setSearch] = useState("");
+  const [orderModal, setOrderModal] = useState<InsightItem | null>(null);
+  const [orderQty, setOrderQty] = useState(200);
 
   const chartData = CHART_DATA[activeRange] || CHART_DATA["30"];
 
@@ -29,6 +63,18 @@ const ForecastScreen = () => {
     r.sku.toLowerCase().includes(search.toLowerCase()) ||
     r.category.toLowerCase().includes(search.toLowerCase())
   );
+
+  const openOrderModal = (item: InsightItem) => {
+    setOrderModal(item);
+    setOrderQty(200);
+  };
+
+  const handlePlaceOrder = () => {
+    if (!orderModal) return;
+    placeInsightOrder({ title: orderModal.title, qty: orderQty, action: orderModal.action });
+    toast.success(`Order placed! ${orderQty} units for "${orderModal.title}"`, { duration: 4000 });
+    setOrderModal(null);
+  };
 
   return (
     <div className="space-y-6">
@@ -165,6 +211,7 @@ const ForecastScreen = () => {
         </Card>
 
         <div className="space-y-6">
+          {/* AI Business Insights */}
           <Card className="border-border shadow-sm bg-gradient-to-br from-primary/5 to-transparent">
             <CardHeader className="pb-3">
               <div className="flex items-center gap-2">
@@ -173,45 +220,29 @@ const ForecastScreen = () => {
               </div>
             </CardHeader>
             <CardContent className="space-y-3">
-              {[
-                {
-                  icon: <Sparkles className="w-3 h-3 text-purple-500" />,
-                  title: "Eid + Wedding Season Starting Soon",
-                  desc: "Big demand coming in 12 days. Ethnic wear sales may go up 2.8x. Stock up now!",
-                  action: "Plan Orders",
-                },
-                {
-                  icon: <TrendingUp className="w-3 h-3 text-emerald-500" />,
-                  title: "Fabric Prices Going Up",
-                  desc: "Cotton yarn prices in Tirupur rising 8%. Buy fabric now before it gets more expensive.",
-                  action: "Order Fabric",
-                },
-                {
-                  icon: <Lightbulb className="w-3 h-3 text-blue-500" />,
-                  title: "East India Demand Growing",
-                  desc: "Kolkata & Bhubaneswar stores selling 38% more ethnic styles. Consider sending more of these.",
-                  action: "See Details",
-                },
-              ].map((item, i) => (
+              {INSIGHT_ITEMS.map((item, i) => (
                 <motion.div
                   key={i}
                   whileHover={{ scale: 1.02 }}
-                  onClick={() => toast.info(`${item.title} — ${item.desc}`)}
-                  className="p-3 rounded-lg border border-border bg-background/50 hover:border-primary/30 transition-colors cursor-pointer group"
+                  className="p-3 rounded-lg border border-border bg-background/50 hover:border-primary/30 transition-colors group"
                 >
                   <div className="flex items-center gap-2 mb-1">
                     {item.icon}
                     <p className="text-xs font-bold leading-none">{item.title}</p>
                   </div>
                   <p className="text-[11px] text-muted-foreground leading-relaxed mb-2">{item.desc}</p>
-                  <div className="flex items-center text-[10px] font-bold text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button
+                    onClick={() => openOrderModal(item)}
+                    className="flex items-center text-[10px] font-bold text-primary hover:underline"
+                  >
                     {item.action} <ArrowUpRight className="w-3 h-3 ml-1" />
-                  </div>
+                  </button>
                 </motion.div>
               ))}
             </CardContent>
           </Card>
 
+          {/* AI Accuracy */}
           <Card className="border-border shadow-sm">
             <CardHeader className="pb-3">
               <div className="flex items-center gap-2">
@@ -222,12 +253,12 @@ const ForecastScreen = () => {
             <CardContent className="space-y-3">
               <div className="flex justify-between items-center text-xs">
                 <span className="text-muted-foreground">Prediction vs actual sales</span>
-                <span className="font-bold text-emerald-600">91.4% accurate</span>
+                <span className="font-bold text-emerald-600">89.2% accurate</span>
               </div>
               <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
                 <motion.div
                   initial={{ width: 0 }}
-                  animate={{ width: "91.4%" }}
+                  animate={{ width: "89.2%" }}
                   transition={{ duration: 1.2, ease: "easeOut" }}
                   className="h-full bg-emerald-500 rounded-full"
                 />
@@ -239,6 +270,76 @@ const ForecastScreen = () => {
           </Card>
         </div>
       </div>
+
+      {/* Order History */}
+      <Card className="border-border shadow-sm">
+        <CardHeader className="pb-4 border-b border-border/50">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <ShoppingBag className="w-4 h-4 text-primary" />
+              <CardTitle className="text-sm font-bold">Order History</CardTitle>
+              {insightOrders.length > 0 && (
+                <Badge className="bg-primary/10 text-primary border-none text-[10px] px-1.5 h-4 font-bold">
+                  {insightOrders.length}
+                </Badge>
+              )}
+            </div>
+            <p className="text-[11px] text-muted-foreground">Orders placed from AI insights</p>
+          </div>
+        </CardHeader>
+        <CardContent className="p-0">
+          <AnimatePresence>
+            {insightOrders.length === 0 ? (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="flex flex-col items-center justify-center py-10 text-center"
+              >
+                <div className="w-12 h-12 rounded-full bg-muted/50 flex items-center justify-center mb-3">
+                  <ShoppingBag className="w-5 h-5 text-muted-foreground/50" />
+                </div>
+                <p className="text-sm font-medium text-muted-foreground">No orders yet</p>
+                <p className="text-[11px] text-muted-foreground/70 mt-1">
+                  Click "Plan Orders", "Order Fabric", or "See Details" on an insight above to place an order.
+                </p>
+              </motion.div>
+            ) : (
+              <div className="divide-y divide-border/50">
+                {insightOrders.map((order, i) => (
+                  <motion.div
+                    key={order.id}
+                    initial={{ opacity: 0, y: -8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.25, delay: i === 0 ? 0 : 0 }}
+                    className="flex items-center gap-4 px-5 py-4"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-950/40 flex items-center justify-center shrink-0">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold truncate">{order.title}</p>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className="text-[11px] text-muted-foreground">{order.qty.toLocaleString()} units</span>
+                        <span className="text-[11px] text-muted-foreground">·</span>
+                        <span className="text-[11px] text-muted-foreground">via {order.action}</span>
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-end gap-1 shrink-0">
+                      <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/40 px-2 py-0.5 rounded-full">
+                        {order.status}
+                      </span>
+                      <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                        <Clock className="w-2.5 h-2.5" />
+                        <span>{order.placedAt.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}</span>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            )}
+          </AnimatePresence>
+        </CardContent>
+      </Card>
 
       {/* Forecast Table */}
       <Card className="border-border shadow-sm">
@@ -315,6 +416,114 @@ const ForecastScreen = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Order Modal */}
+      <AnimatePresence>
+        {orderModal && (
+          <>
+            <motion.div
+              key="backdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.18 }}
+              className="fixed inset-0 z-50 bg-foreground/40 backdrop-blur-sm"
+              onClick={() => setOrderModal(null)}
+            />
+            <motion.div
+              key="modal"
+              initial={{ opacity: 0, scale: 0.96, y: 24 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.97, y: 12 }}
+              transition={{ duration: 0.22, ease: "easeOut" }}
+              className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none"
+            >
+              <div className="bg-card border border-border rounded-2xl shadow-2xl w-full max-w-[440px] pointer-events-auto overflow-hidden">
+                {/* Accent stripe */}
+                <div className="h-1 w-full bg-gradient-to-r from-primary to-primary/60" />
+
+                {/* Header */}
+                <div className="flex items-start justify-between px-6 pt-5 pb-4 border-b border-border">
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-1">AI Business Insight</p>
+                    <h2 className="text-base font-bold tracking-tight leading-tight">{orderModal.title}</h2>
+                  </div>
+                  <button
+                    onClick={() => setOrderModal(null)}
+                    className="p-2 rounded-xl hover:bg-muted transition-colors text-muted-foreground shrink-0"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+
+                {/* Body */}
+                <div className="px-6 py-5 space-y-5">
+                  {/* Description */}
+                  <div className="p-3 rounded-xl bg-muted/30 border border-border/60">
+                    <p className="text-sm text-muted-foreground leading-relaxed">{orderModal.desc}</p>
+                  </div>
+
+                  {/* Quantity slider */}
+                  <div>
+                    <div className="flex items-baseline justify-between mb-3">
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Order Quantity</p>
+                      <span className="text-2xl font-black tabular-nums">
+                        {orderQty.toLocaleString()}
+                        <span className="text-sm font-normal text-muted-foreground ml-1.5">units</span>
+                      </span>
+                    </div>
+                    <input
+                      type="range"
+                      min={50}
+                      max={1000}
+                      step={10}
+                      value={orderQty}
+                      onChange={e => setOrderQty(Number(e.target.value))}
+                      className="w-full accent-primary cursor-pointer"
+                    />
+                    <div className="flex justify-between mt-2">
+                      <span className="text-[10px] text-muted-foreground">Min 50</span>
+                      <span className="text-[10px] font-semibold text-primary">Slide to adjust</span>
+                      <span className="text-[10px] text-muted-foreground">Max 1,000</span>
+                    </div>
+                  </div>
+
+                  {/* Summary row */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="bg-muted/30 rounded-xl px-4 py-3">
+                      <p className="text-[10px] text-muted-foreground mb-1">Action</p>
+                      <p className="text-sm font-bold">{orderModal.action}</p>
+                    </div>
+                    <div className="bg-emerald-50 dark:bg-emerald-950/10 border border-emerald-100 dark:border-emerald-900/30 rounded-xl px-4 py-3">
+                      <p className="text-[10px] text-muted-foreground mb-1">Est. units</p>
+                      <p className="text-sm font-black text-emerald-600 dark:text-emerald-400">{orderQty.toLocaleString()} pcs</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Footer */}
+                <div className="px-6 pb-6 flex gap-3">
+                  <button
+                    onClick={() => setOrderModal(null)}
+                    className="flex-1 py-3 rounded-xl border border-border text-sm font-semibold text-muted-foreground hover:bg-muted transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={handlePlaceOrder}
+                    className="flex-1 py-3 rounded-xl bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground text-sm font-bold transition-all shadow-lg hover:shadow-primary/30 flex items-center justify-center gap-2"
+                  >
+                    <ShoppingBag className="w-4 h-4" />
+                    Place Order
+                  </motion.button>
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

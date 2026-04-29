@@ -130,22 +130,22 @@ export interface Metrics {
 // ─── Metrics ─────────────────────────────────────────────────────────────────
 
 export const METRICS: Metrics = {
-  totalInventory: "₹14.2 Cr",
-  sellThroughToday: "₹6.8L",
-  forecastAccuracy: "91.4%",
+  totalInventory: "₹13.2 L",
+  sellThroughToday: "₹68,400",
+  forecastAccuracy: "89.2%",
   itemsNeedRestock: 142,
-  oldStockValue: "₹2.1 Cr",
-  oldStockPercent: "14.7%",
+  oldStockValue: "₹1.9 L",
+  oldStockPercent: "14.4%",
   ordersThisMonth: 86,
   autoProcessed: 41,
-  freshStockValue: "₹9.4 Cr",
+  freshStockValue: "₹8.7 L",
   freshStockPercent: 66,
-  slowStockValue: "₹2.7 Cr",
-  slowStockPercent: 19,
-  deadStockValue: "₹2.1 Cr",
-  deadStockPercent: 15,
-  projectedRevenue: "₹2.1 Cr",
-  cutPlanBudget: "₹68.4 L",
+  slowStockValue: "₹2.6 L",
+  slowStockPercent: 20,
+  deadStockValue: "₹1.9 L",
+  deadStockPercent: 14,
+  projectedRevenue: "₹4.8 L",
+  cutPlanBudget: "₹2.4 L",
   onTimeDelivery: "74.2%",
   autoPosSent: 86,
 };
@@ -295,33 +295,33 @@ export const CRITICAL_ALERTS: StockAlert[] = [
     id: "alert-001",
     type: "critical",
     icon: "🚨",
-    title: "Polo Tee (Navy, Medium) — STOCK RUNNING OUT",
+    title: "Polo Tee (Navy, Medium) — Stock Running Out",
     issue: "Will be completely empty in 2 days",
-    details: "47 stores need this item. Warehouse has 1,800 pieces ready to send. We need to move them NOW to avoid losing sales worth ₹4.8 Lakh.",
+    details: "8 stores need this item. Warehouse has 180 pieces ready to send. Move them now to avoid losing sales worth ₹48,000.",
     action: "Send Stock to Stores",
-    moneyAtRisk: "₹4.8 Lakh",
+    moneyAtRisk: "₹48,000",
     linkedItemId: "inv-001",
   },
   {
     id: "alert-002",
     type: "critical",
     icon: "📈",
-    title: "Printed Kurti (Pink, Large) — HUGE DEMAND",
+    title: "Printed Kurti (Pink, Large) — High Demand",
     issue: "Sales jumped 62% this week — people want this!",
-    details: "Customers are buying much more than usual. Factory can make 2,400 more in 6 days. Order now to earn extra ₹7.2 Lakh in profit.",
+    details: "Customers are buying much more than usual. Factory can make 240 more in 6 days. Order now to capture ₹72,000 in additional sales.",
     action: "Place Order Now",
-    moneyAtRisk: "₹7.2 Lakh potential",
+    moneyAtRisk: "₹72,000 opportunity",
     linkedItemId: "inv-002",
   },
   {
     id: "alert-003",
     type: "critical",
     icon: "👕",
-    title: "Grey Sweatshirt (Large) — ALMOST OUT",
+    title: "Grey Sweatshirt (Large) — Almost Out",
     issue: "Only 1 day of stock remaining",
-    details: "12 stores are already empty. Every day we lose ₹2.4 Lakh in sales. Factory can rush 4,000 pieces in 5 days.",
+    details: "3 stores already empty. Every day we lose ₹24,000 in sales. Factory can rush 400 pieces in 5 days.",
     action: "Quick Order",
-    moneyAtRisk: "₹2.4 Lakh/day lost",
+    moneyAtRisk: "₹24,000/day",
     linkedItemId: "inv-003",
   },
 ];
@@ -331,29 +331,29 @@ export const WARNING_ALERTS: StockAlert[] = [
     id: "alert-004",
     type: "warning",
     icon: "🚚",
-    title: "Bulk Order to Indore — DELAYED",
+    title: "Bulk Order to Indore — Delayed",
     issue: "Fabric supplier is 6 days behind schedule",
-    details: "The fabric company in Tirupur is running late. If they don't deliver by April 22, we could face a ₹5 Lakh penalty with the Indore franchise. Our AI has already sent them follow-up messages.",
+    details: "The supplier in Tirupur is running late. If they don't deliver by April 22, we could face a ₹50,000 penalty with the Indore franchise. AI has already sent follow-up messages.",
     action: "Follow Up With Supplier",
-    moneyAtRisk: "₹5 Lakh penalty risk",
+    moneyAtRisk: "₹50,000 penalty risk",
   },
   {
     id: "alert-005",
     type: "warning",
     icon: "📦",
-    title: "Old Stock Sitting in Warehouse — Money Locked Up",
-    issue: "₹2.1 Crore not selling for 90+ days",
-    details: "Kids and Boys clothes have been sitting for over 3 months. Consider discounting them to free up ₹2.1 Cr cash for buying fresh, popular stock.",
+    title: "Old Stock Sitting in Warehouse",
+    issue: "₹1.9 L not selling for 90+ days",
+    details: "Kids and Boys clothing have been sitting for over 3 months. Consider a discount to free up ₹1.9 L in cash for buying fresh, popular stock.",
     action: "Plan Clearance Sale",
-    moneyAtRisk: "₹2.1 Cr locked",
+    moneyAtRisk: "₹1.9 L locked",
   },
   {
     id: "alert-006",
     type: "warning",
     icon: "📉",
-    title: "Sales Dropping in North India Stores — Slow Moving",
+    title: "Sales Dropping — North India Stores",
     issue: "Lucknow & Patna stores selling 14% less than last month",
-    details: "These stores are underperforming. Customers there may prefer different styles or sizes. We should review what's being sent and adjust the product mix.",
+    details: "These stores are underperforming. Customers may prefer different styles or sizes. Review what's being sent and adjust the product mix.",
     action: "Review Store Mix",
     moneyAtRisk: "14% revenue drop",
   },
@@ -483,7 +483,7 @@ export const AGENTS: Agent[] = [
     avatar: "📦",
     name: "Restocking & Manufacturing Agent",
     status: "Running · Checked 8,420 products at 6:00 AM across 47 stores + warehouses",
-    meta: "11 orders + 3 manufacturing orders today · ₹38.4L value",
+    meta: "11 orders + 3 manufacturing orders today · ₹3.84 L value",
     logs: [
       { time: "06:00", type: "CHECK", typeColor: "text-blue-500", text: "Scanning all 8,420 products across warehouses, 47 stores, 180 partner stores against stock thresholds..." },
       { time: "06:01", type: "ALERT", typeColor: "text-yellow-500", text: "Polo Navy (M): 47 stores at less than 2 days stock. Warehouse has 1,800 pieces ready. Transfer not raised yet." },
@@ -497,7 +497,7 @@ export const AGENTS: Agent[] = [
     avatar: "📊",
     name: "Sales Forecast & Buying Agent",
     status: "Running · Updating predictions with latest sales data from PAN India stores",
-    meta: "91.4% accuracy · Updated daily",
+    meta: "89.2% accuracy · Updated daily",
     logs: [
       { time: "05:00", type: "CHECK", typeColor: "text-blue-500", text: "Pulling 90-day sales data from all stores and online channels..." },
       { time: "05:02", type: "CHECK", typeColor: "text-blue-500", text: "Checking return rates, festive calendar (Eid, Diwali, weddings), and seasonal demand patterns for North and East India..." },
@@ -616,78 +616,39 @@ export const TRANSFER_RECOMMENDATIONS: TransferRecommendation[] = [
     product: "Polo T-Shirt",
     variant: "Navy Blue · Medium",
     category: "Men's Tops",
-    from: { storeId: "ST-03", name: "Linking Road", city: "Mumbai", stock: 520, velocity: 8, daysCover: 65 },
-    to:   { storeId: "ST-01", name: "Connaught Place", city: "Delhi", stock: 80, velocity: 42, daysCover: 2 },
-    minUnits: 240,
-    maxUnits: 300,
+    from: { storeId: "ST-03", name: "Linking Road", city: "Mumbai", stock: 52, velocity: 3, daysCover: 17 },
+    to:   { storeId: "ST-01", name: "Connaught Place", city: "Delhi", stock: 8, velocity: 4, daysCover: 2 },
+    minUnits: 22,
+    maxUnits: 30,
     urgency: "critical",
-    estimatedValue: "₹72,000",
+    estimatedValue: "₹7,100",
     costPerPc: 268,
   },
   {
     id: "TR-002",
-    product: "Polo T-Shirt",
-    variant: "Navy Blue · Medium",
-    category: "Men's Tops",
-    from: { storeId: "ST-04", name: "Phoenix Market City", city: "Pune", stock: 380, velocity: 5, daysCover: 76 },
-    to:   { storeId: "ST-06", name: "Park Street", city: "Kolkata", stock: 95, velocity: 35, daysCover: 3 },
-    minUnits: 170,
-    maxUnits: 215,
+    product: "Printed Kurti",
+    variant: "Pink · Large",
+    category: "Women's Ethnic",
+    from: { storeId: "ST-02", name: "Lajpat Nagar", city: "Delhi", stock: 36, velocity: 2, daysCover: 18 },
+    to:   { storeId: "ST-01", name: "Connaught Place", city: "Delhi", stock: 5, velocity: 3, daysCover: 2 },
+    minUnits: 12,
+    maxUnits: 18,
     urgency: "critical",
-    estimatedValue: "₹51,400",
-    costPerPc: 268,
+    estimatedValue: "₹4,800",
+    costPerPc: 320,
   },
   {
     id: "TR-003",
-    product: "Printed Kurti",
-    variant: "Pink · Large",
-    category: "Women's Ethnic",
-    from: { storeId: "ST-02", name: "Lajpat Nagar", city: "Delhi", stock: 180, velocity: 4, daysCover: 45 },
-    to:   { storeId: "ST-01", name: "Connaught Place", city: "Delhi", stock: 30, velocity: 28, daysCover: 1 },
-    minUnits: 90,
-    maxUnits: 115,
-    urgency: "critical",
-    estimatedValue: "₹32,800",
-    costPerPc: 320,
-  },
-  {
-    id: "TR-004",
-    product: "Printed Kurti",
-    variant: "Pink · Large",
-    category: "Women's Ethnic",
-    from: { storeId: "ST-04", name: "Phoenix Market City", city: "Pune", stock: 340, velocity: 3, daysCover: 113 },
-    to:   { storeId: "ST-03", name: "Linking Road", city: "Mumbai", stock: 22, velocity: 19, daysCover: 1 },
-    minUnits: 130,
-    maxUnits: 165,
-    urgency: "critical",
-    estimatedValue: "₹47,200",
-    costPerPc: 320,
-  },
-  {
-    id: "TR-005",
     product: "Crew-Neck Sweatshirt",
     variant: "Grey · Large",
     category: "Men's Tops",
-    from: { storeId: "ST-08", name: "Jubilee Hills", city: "Hyderabad", stock: 440, velocity: 3, daysCover: 147 },
-    to:   { storeId: "ST-10", name: "Sector 17", city: "Chandigarh", stock: 72, velocity: 28, daysCover: 3 },
-    minUnits: 180,
-    maxUnits: 240,
+    from: { storeId: "ST-08", name: "Jubilee Hills", city: "Hyderabad", stock: 48, velocity: 2, daysCover: 24 },
+    to:   { storeId: "ST-10", name: "Sector 17", city: "Chandigarh", stock: 7, velocity: 3, daysCover: 2 },
+    minUnits: 15,
+    maxUnits: 22,
     urgency: "high",
-    estimatedValue: "₹79,800",
+    estimatedValue: "₹6,840",
     costPerPc: 380,
-  },
-  {
-    id: "TR-006",
-    product: "Printed Kurti",
-    variant: "Pink · Large",
-    category: "Women's Ethnic",
-    from: { storeId: "ST-09", name: "CG Road", city: "Ahmedabad", stock: 200, velocity: 4, daysCover: 50 },
-    to:   { storeId: "ST-07", name: "Anna Nagar", city: "Chennai", stock: 15, velocity: 14, daysCover: 1 },
-    minUnits: 75,
-    maxUnits: 100,
-    urgency: "high",
-    estimatedValue: "₹28,000",
-    costPerPc: 320,
   },
 ];
 
@@ -697,37 +658,37 @@ export const generateAIResponse = (userMessage: string): string => {
   const msg = userMessage.toLowerCase();
 
   if (msg.includes("polo") || msg.includes("navy")) {
-    return "✅ Polo Navy update: 1,800 pieces at Ludhiana warehouse ready to dispatch. Stock transfer to 41 stores will go out by 2 PM today. Your stores will receive it by Apr 10. Total value: ₹6.3 Lakh.";
+    return "✅ Polo Navy update: 180 pieces at warehouse ready to dispatch. Stock transfer to 8 stores going out by 2 PM today. Stores will receive by Apr 10. Total value moved: ₹63,000.";
   }
   if (msg.includes("kurti") || msg.includes("pink")) {
-    return "📈 Printed Kurti (Pink, L): Sales are up 62% this week — people really want this! Only 240 pieces left. Factory can make 2,400 more in 6 days. Shall I place the order now? (Approx ₹7.68 Lakh)";
+    return "📈 Printed Kurti (Pink, L): Sales up 62% this week — demand is real! Only 24 pieces left. Factory can make 240 more in 6 days. Shall I place the order now? (Approx ₹76,800)";
   }
   if ((msg.includes("stock") || msg.includes("inventory")) && (msg.includes("status") || msg.includes("kitna") || msg.includes("how"))) {
-    return "📦 Today's Stock Summary:\n• Total stock value: ₹14.2 Crore\n• Selling well: ₹9.4 Cr (66%)\n• Getting low: 142 products need restocking\n• Old/unsold stock: ₹2.1 Cr (sitting 90+ days)";
+    return "📦 Today's Stock Summary:\n• Total stock value: ₹13.2 Lakh\n• Selling well: ₹8.7 L (66%)\n• Getting low: 14 products need restocking\n• Old/unsold stock: ₹1.9 L (sitting 90+ days)";
   }
   if (msg.includes("order") || msg.includes("po")) {
-    return "📋 Today's Orders: 11 purchase orders placed automatically worth ₹38.4 Lakh. 3 more orders are waiting for your approval. Want me to list them with details?";
+    return "📋 Today's Orders: 11 purchase orders placed automatically worth ₹3.84 L. 3 more orders are waiting for your approval. Want me to list them?";
   }
   if (msg.includes("supplier") || msg.includes("vendor")) {
     return "🤝 Supplier Update:\n• Punjab Print House — delayed 6 days on Lot #PR-2041 (follow-up sent)\n• Unit 2 (Ludhiana) — on track, all orders confirmed\n• 3 other suppliers — all delivering on time";
   }
   if (msg.includes("indore") || msg.includes("franchise") || msg.includes("bulk") || msg.includes("blk-118")) {
-    return "🚚 Bulk Order Update: Bulk order #BLK-118 (Indore franchise) is at risk — fabric supplier delayed. Penalty deadline: Apr 22. I'm tracking this hourly and will alert you if it worsens. Want me to contact the backup supplier?";
+    return "🚚 Bulk Order Update: Bulk order #BLK-118 (Indore franchise) is at risk — fabric supplier delayed. Penalty deadline: Apr 22. Tracking this hourly. Want me to contact the backup supplier?";
   }
   if (msg.includes("forecast") || msg.includes("predict") || msg.includes("demand")) {
-    return "🎯 Next 30 Days Prediction:\n• Wedding + Eid season starting in 12 days\n• Ethnic wear demand expected to rise 2.8x\n• Top items to stock up: Printed Kurti, Anarkali, Sherwani Kurta\n• Predicted revenue: ₹2.1 Crore";
+    return "🎯 Next 30 Days Prediction:\n• Wedding + Eid season starting in 12 days\n• Ethnic wear demand expected to rise 2.8x\n• Top items to stock up: Printed Kurti, Anarkali, Sherwani Kurta\n• Predicted revenue: ₹4.8 Lakh";
   }
   if (msg.includes("summary") || msg.includes("aaj") || msg.includes("today") || msg.includes("report")) {
-    return "📊 Today's Business Summary:\n• Sales today: ₹6.8 Lakh ✅\n• Urgent issues: 3 (need your attention)\n• Problems solved by AI: 14\n• Orders placed automatically: 11\n• Forecast accuracy: 91.4% 🎯";
+    return "📊 Today's Business Summary:\n• Sales today: ₹68,400 ✅\n• Urgent issues: 3 (need your attention)\n• Problems solved by AI: 14\n• Orders placed automatically: 11\n• Forecast accuracy: 89.2% 🎯";
   }
   if (msg.includes("haan") || msg.includes("yes") || msg.includes("ok ") || msg.includes("karo") || msg.includes("do it") || msg.includes("confirm")) {
-    return "✅ Done! I've actioned your request and notified the relevant teams via WhatsApp. You'll get a confirmation message from the factory/warehouse within the next few minutes.";
+    return "✅ Done! I've actioned your request and notified the relevant teams via WhatsApp. You'll get a confirmation from the factory/warehouse in a few minutes.";
   }
   if (msg.includes("nahi") || msg.includes("no") || msg.includes("ruk") || msg.includes("wait") || msg.includes("hold")) {
     return "⏸️ Understood — I've put that action on hold. I'll flag it again tomorrow morning in your daily briefing. Let me know if you'd like to discuss alternatives.";
   }
   if (msg.includes("clearance") || msg.includes("old stock") || msg.includes("aged") || msg.includes("discount")) {
-    return "🏷️ Old Stock Plan: ₹2.1 Crore worth of kids and boys clothes sitting for 90+ days. Recommended: 20% discount across Amazon, Myntra, Flipkart. Expected recovery: ₹1.68 Crore within 30 days. Should I set this up?";
+    return "🏷️ Old Stock Plan: ₹1.9 Lakh worth of kids and boys clothes sitting for 90+ days. Recommended: 20% discount across Amazon, Myntra, Flipkart. Expected recovery: ₹1.52 L within 30 days. Should I set this up?";
   }
 
   const defaultResponses = [

@@ -24,6 +24,15 @@ export interface Transfer extends TransferRecommendation {
   approvedQty?: number;
 }
 
+export interface InsightOrder {
+  id: string;
+  title: string;
+  qty: number;
+  action: string;
+  placedAt: Date;
+  status: "Placed";
+}
+
 interface ChatMessage {
   id: string;
   sender: "bot" | "user";
@@ -42,6 +51,8 @@ interface AppState {
   chatMessages: ChatMessage[];
   isBotTyping: boolean;
   transfers: Transfer[];
+  insightOrders: InsightOrder[];
+  unreadOrderCount: number;
 }
 
 interface AppActions {
@@ -56,6 +67,8 @@ interface AppActions {
   sendChatMessage: (text: string) => void;
   approveTransfer: (id: string, qty: number) => void;
   rejectTransfer: (id: string) => void;
+  placeInsightOrder: (order: Omit<InsightOrder, "id" | "placedAt" | "status">) => void;
+  resetOrderCount: () => void;
 }
 
 const AppContext = createContext<(AppState & AppActions) | null>(null);
@@ -64,7 +77,7 @@ const INITIAL_MESSAGES: ChatMessage[] = [
   {
     id: "init-1",
     sender: "bot",
-    text: "🚨 URGENT — Polo Navy (M)\n\n• 47 stores have less than 2 days of stock\n• Current daily sales: 312 pieces\n• Warehouse stock ready: 1,800 pieces\n\nRecommended: Move 1,750 pieces to 41 stores right now.\n\nShall I initiate this transfer?",
+    text: "🚨 URGENT — Polo Navy (M)\n\n• 8 stores have less than 2 days of stock\n• Current daily sales: 32 pieces\n• Warehouse stock ready: 180 pieces\n\nRecommended: Move 175 pieces to stores right now.\n\nShall I initiate this transfer?",
     time: "09:14 AM",
   },
   {
@@ -76,7 +89,7 @@ const INITIAL_MESSAGES: ChatMessage[] = [
   {
     id: "init-3",
     sender: "bot",
-    text: "✅ Stock Transfer #STO-2047 RELEASED\n\n• 41 store managers notified via WhatsApp\n• Warehouse dispatch scheduled for 2:00 PM\n• Stores will receive stock by Apr 10\n\nTotal value moved: ₹6.3 Lakh\n\nNote: Grey Sweatshirt (L) is also at 1-day cover. Send manufacturing order to Unit 2?",
+    text: "✅ Stock Transfer #STO-2047 RELEASED\n\n• Store managers notified via WhatsApp\n• Warehouse dispatch scheduled for 2:00 PM\n• Stores will receive stock by Apr 10\n\nTotal value moved: ₹63,000\n\nNote: Grey Sweatshirt (L) is also at 1-day cover. Send manufacturing order to Unit 2?",
     time: "09:15 AM",
   },
   {
@@ -88,7 +101,7 @@ const INITIAL_MESSAGES: ChatMessage[] = [
   {
     id: "init-5",
     sender: "bot",
-    text: "📊 Today's Summary:\n\n• Sales today: ₹6.8 Lakh ✅\n• Urgent issues: 3 (need your attention)\n• Problems solved by AI: 14\n• Orders placed automatically: 11 (worth ₹38.4 Lakh)\n• Forecast accuracy: 91.4% 🎯\n\nOld stock worth ₹2.1 Crore sitting for 90+ days — want me to set up a clearance sale?",
+    text: "📊 Today's Summary:\n\n• Sales today: ₹68,400 ✅\n• Urgent issues: 3 (need your attention)\n• Problems solved by AI: 14\n• Orders placed automatically: 11 (worth ₹3.84 L)\n• Forecast accuracy: 89.2% 🎯\n\nOld stock worth ₹1.9 Lakh sitting for 90+ days — want me to set up a clearance sale?",
     time: "09:16 AM",
   },
 ];
@@ -105,6 +118,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [transfers, setTransfers] = useState<Transfer[]>(
     TRANSFER_RECOMMENDATIONS.map(t => ({ ...t, status: "pending" as const }))
   );
+  const [insightOrders, setInsightOrders] = useState<InsightOrder[]>([]);
+  const [unreadOrderCount, setUnreadOrderCount] = useState(0);
 
   const metrics: Metrics = {
     ...METRICS,
@@ -171,6 +186,18 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     ));
   }, []);
 
+  const placeInsightOrder = useCallback((order: Omit<InsightOrder, "id" | "placedAt" | "status">) => {
+    setInsightOrders(prev => [{
+      ...order,
+      id: `ORD-${Date.now()}`,
+      placedAt: new Date(),
+      status: "Placed" as const,
+    }, ...prev]);
+    setUnreadOrderCount(prev => prev + 1);
+  }, []);
+
+  const resetOrderCount = useCallback(() => setUnreadOrderCount(0), []);
+
   const rejectTransfer = useCallback((id: string) => {
     setTransfers(prev => prev.map(t =>
       t.id === id ? { ...t, status: "rejected" as const } : t
@@ -228,6 +255,10 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       transfers,
       approveTransfer,
       rejectTransfer,
+      insightOrders,
+      placeInsightOrder,
+      unreadOrderCount,
+      resetOrderCount,
     }}>
       {children}
     </AppContext.Provider>

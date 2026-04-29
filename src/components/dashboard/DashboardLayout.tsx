@@ -11,14 +11,15 @@ import AgentsScreen from "./screens/AgentsScreen";
 import WhatsAppScreen from "./screens/WhatsAppScreen";
 import OnboardScreen from "./screens/OnboardScreen";
 import TransferScreen from "./screens/TransferScreen";
+import OrderHistoryScreen from "./screens/OrderHistoryScreen";
 import POModal from "./POModal";
 
-export type ScreenName = "dashboard" | "alerts" | "inventory" | "forecast" | "suppliers" | "agents" | "whatsapp" | "onboard" | "transfer";
+export type ScreenName = "dashboard" | "alerts" | "inventory" | "forecast" | "suppliers" | "agents" | "whatsapp" | "onboard" | "transfer" | "orderHistory";
 
 const Inner = () => {
   const [activeScreen, setActiveScreen] = useState<ScreenName>("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { metrics, criticalAlerts, transfers } = useApp();
+  const { metrics, criticalAlerts, transfers, unreadOrderCount, resetOrderCount } = useApp();
   const pendingTransferCount = transfers.filter(t => t.status === "pending").length;
   const mainRef = useRef<HTMLElement>(null);
 
@@ -38,8 +39,9 @@ const Inner = () => {
       case "agents":     return <AgentsScreen />;
       case "whatsapp":   return <WhatsAppScreen />;
       case "onboard":    return <OnboardScreen />;
-      case "transfer":   return <TransferScreen />;
-      default:           return <DashboardScreen onNavigate={setActiveScreen} />;
+      case "transfer":     return <TransferScreen />;
+      case "orderHistory": return <OrderHistoryScreen />;
+      default:             return <DashboardScreen onNavigate={setActiveScreen} />;
     }
   };
 
@@ -50,23 +52,36 @@ const Inner = () => {
       <div className="flex-1 flex overflow-hidden">
         <Sidebar
           activeScreen={activeScreen}
-          onNavigate={(screen) => { setActiveScreen(screen); setSidebarOpen(false); }}
+          onNavigate={(screen) => {
+            setActiveScreen(screen);
+            setSidebarOpen(false);
+            if (screen === "orderHistory") resetOrderCount();
+          }}
           mobileOpen={sidebarOpen}
           onClose={() => setSidebarOpen(false)}
           alertCount={criticalAlerts.length}
           transferCount={pendingTransferCount}
+          orderHistoryCount={unreadOrderCount}
         />
 
         <main ref={mainRef} className="flex-1 overflow-y-auto">
-          <div className="bg-primary/5 border-b border-primary/10 px-6 py-2.5 flex items-center gap-8 overflow-x-auto">
-            <div className="flex items-center gap-1.5 shrink-0">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">Live</span>
+          <div className="bg-gradient-to-r from-background via-secondary/10 to-background border-b border-border/40 px-6 py-3 flex items-center gap-3 md:gap-4 overflow-x-auto shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] backdrop-blur-md sticky top-0 z-10">
+            <div className="flex items-center gap-2 shrink-0 bg-emerald-50 dark:bg-emerald-500/10 px-3 py-1.5 rounded-full border border-emerald-200 dark:border-emerald-500/20 shadow-sm">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              </span>
+              <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-widest">Live Sync</span>
             </div>
-            <TickerItem label="Stock Value" value={metrics.totalInventory} />
-            <TickerItem label="Sales Today" value={metrics.sellThroughToday} />
-            <TickerItem label="AI Accuracy" value={metrics.forecastAccuracy} />
-            <TickerItem label="Alerts" value={String(criticalAlerts.length) + " urgent"} highlight={criticalAlerts.length > 0} />
+            
+            <div className="h-4 w-px bg-border/60 mx-1 md:mx-2 hidden sm:block shrink-0"></div>
+            
+            <div className="flex items-center gap-3 overflow-x-auto no-scrollbar pb-1 -mb-1">
+              <TickerItem label="Stock Value" value={metrics.totalInventory} />
+              <TickerItem label="Sales Today" value={metrics.sellThroughToday} />
+              <TickerItem label="AI Accuracy" value={metrics.forecastAccuracy} />
+              <TickerItem label="Alerts" value={String(criticalAlerts.length) + " Action Needed"} highlight={criticalAlerts.length > 0} />
+            </div>
           </div>
 
           <div className="p-4 md:p-6 animate-in fade-in duration-300">
@@ -87,9 +102,17 @@ const DashboardLayout = () => (
 );
 
 const TickerItem = ({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) => (
-  <div className="flex gap-2 whitespace-nowrap items-center">
-    <span className="text-[11px] text-muted-foreground font-medium">{label}:</span>
-    <span className={`text-[11px] font-bold ${highlight ? "text-destructive" : "text-foreground"}`}>{value}</span>
+  <div className={`flex items-center gap-2 whitespace-nowrap px-3.5 py-1.5 rounded-full transition-all duration-300 border ${
+    highlight 
+      ? "bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800 shadow-sm" 
+      : "bg-white dark:bg-card border-border/50 shadow-sm hover:border-border hover:shadow"
+  }`}>
+    <span className={`text-[11px] font-medium ${highlight ? "text-amber-700 dark:text-amber-400" : "text-muted-foreground"}`}>
+      {label}
+    </span>
+    <span className={`text-xs font-bold ${highlight ? "text-amber-700 dark:text-amber-400" : "text-foreground"}`}>
+      {value}
+    </span>
   </div>
 );
 

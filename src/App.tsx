@@ -7,6 +7,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import SignIn from "./pages/SignIn.tsx";
 import Dashboard from "./pages/Dashboard.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import LandingPage from "./components/LandingPage.tsx";
 
 const queryClient = new QueryClient();
 
@@ -20,9 +21,9 @@ const App = () => {
         <Sonner />
         <BrowserRouter>
           <Routes>
+            <Route path="/" element={<LandingPage />} />
             <Route path="/signin" element={<SignIn onSignIn={() => setIsSignedIn(true)} />} />
             <Route path="/dashboard" element={isSignedIn ? <Dashboard /> : <Navigate to="/signin" />} />
-            <Route path="/" element={<Navigate to={isSignedIn ? "/dashboard" : "/signin"} />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

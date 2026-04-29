@@ -2,7 +2,7 @@ const agents = [
   {
     avatar: "📦", name: "Replenishment & Cut-Plan Agent",
     status: "Running · Checked 8,420 SKUs at 6:00 AM across 47 EBOs + DCs",
-    meta: "11 POs + 3 cut orders today · ₹38.4L value",
+    meta: "11 POs + 3 cut orders today · ₹3.84 L value",
     logs: [
       { time: "06:00", type: "CHECK", typeColor: "text-info", text: "Scanning all 8,420 SKUs across DCs, 47 EBOs, 180 MBOs against size-curve & DOH thresholds..." },
       { time: "06:01", type: "ALERT", typeColor: "text-warning", text: "Polo Navy (M): 47 EBOs at <2 days cover. DC has 1,800 pcs ready. STO not raised." },
@@ -17,7 +17,7 @@ const agents = [
   {
     avatar: "📊", name: "Forecast & Buying Agent",
     status: "Running · Retraining on Apr sell-through across PAN India stores",
-    meta: "91.4% accuracy · Updated daily",
+    meta: "89.2% accuracy · Updated daily",
     logs: [
       { time: "05:00", type: "CHECK", typeColor: "text-info", text: "Pulling 90 days sell-through from Maplemonk + EasyEcom + EBO POS feeds..." },
       { time: "05:02", type: "CHECK", typeColor: "text-info", text: "Cross-referencing returns, size-curve drift, wedding/Eid calendar, regional seasonal demand..." },

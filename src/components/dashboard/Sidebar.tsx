@@ -8,9 +8,10 @@ interface SidebarProps {
   onClose: () => void;
   alertCount?: number;
   transferCount?: number;
+  orderHistoryCount?: number;
 }
 
-const Sidebar = ({ activeScreen, onNavigate, mobileOpen, onClose, alertCount = 0, transferCount = 0 }: SidebarProps) => {
+const Sidebar = ({ activeScreen, onNavigate, mobileOpen, onClose, alertCount = 0, transferCount = 0, orderHistoryCount = 0 }: SidebarProps) => {
   const navItems: {
     section: string;
     items: { icon: string; label: string; screen: ScreenName; badge?: string; badgeColor?: string }[];
@@ -41,6 +42,7 @@ const Sidebar = ({ activeScreen, onNavigate, mobileOpen, onClose, alertCount = 0
         items: [
           { icon: "⬡", label: "AI Agents", screen: "agents", badge: "3", badgeColor: "success" },
           { icon: "✦", label: "WhatsApp Bot", screen: "whatsapp" },
+          { icon: "🛍", label: "Order History", screen: "orderHistory", badge: orderHistoryCount > 0 ? String(orderHistoryCount) : undefined },
         ],
       },
       {

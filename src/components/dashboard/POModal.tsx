@@ -3,12 +3,23 @@ import { Button } from "@/components/ui/button";
 import { useApp } from "@/context/AppContext";
 
 const POModal = () => {
-  const { currentPO, closePO, confirmPO } = useApp();
+  const { currentPO, closePO, confirmPO, placeInsightOrder } = useApp();
   const open = !!currentPO;
 
   if (!currentPO) return null;
 
   const isLiquidation = currentPO.orderNumber.startsWith("LIQ-");
+
+  const handleConfirm = () => {
+    if (!isLiquidation) {
+      placeInsightOrder({
+        title: currentPO.style,
+        qty: parseInt(currentPO.quantity.replace(/[^0-9]/g, ""), 10) || 0,
+        action: "Confirm & Send Order",
+      });
+    }
+    confirmPO();
+  };
 
   const lines = [
     { key: "Reference Number", value: currentPO.orderNumber },
@@ -42,7 +53,7 @@ const POModal = () => {
             : "Our AI analysed your sales speed and supplier lead times to create this order. Please review and confirm."}
         </div>
 
-        <div className="divide-y divide-border">
+        <div className="overflow-y-auto max-h-[55vh] divide-y divide-border">
           {lines.map((line) => (
             <div key={line.key} className="flex justify-between py-2.5 text-sm">
               <span className="text-muted-foreground">{line.key}</span>
@@ -57,7 +68,10 @@ const POModal = () => {
 
         <DialogFooter className="gap-2">
           <Button variant="outline" onClick={closePO}>Cancel</Button>
-          <Button onClick={confirmPO} className="flex-1 bg-green-600 hover:bg-green-700">
+          <Button
+            onClick={handleConfirm}
+            className="flex-1 bg-green-600 hover:bg-green-700"
+          >
             ✓ {isLiquidation ? "Yes, Start the Sale" : "Confirm & Send Order"}
           </Button>
         </DialogFooter>

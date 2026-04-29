@@ -63,7 +63,7 @@ const SuppliersScreen = () => {
         <KPICard
           title="Auto-Orders Sent Today"
           value={String(metrics.autoPosSent)}
-          description="₹38.4L handled by AI"
+          description="₹3.84 L handled by AI"
           icon={<Zap className="w-4 h-4 text-primary" />}
           color="bg-primary"
         />
