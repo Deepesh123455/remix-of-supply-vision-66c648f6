@@ -973,61 +973,61 @@ const metrics = [
   },
 ];
 
-function MetricsSection() {
-  return (
-    <Section className="py-28 px-6 overflow-hidden" style={{ background: "#1A1A1A" }}>
-      <div className="max-w-7xl mx-auto">
-        <motion.div variants={fadeUp} custom={0} className="text-center mb-16 space-y-4">
-          <h2
-            className="text-4xl md:text-5xl font-extrabold tracking-tight"
-            style={{ color: "#F5F0E8" }}
-          >
-            Numbers that{" "}
-            <span
-              style={{
-                background: "linear-gradient(135deg, #B07D3A, #D4A85A)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-              }}
-            >
-              speak for themselves
-            </span>
-          </h2>
-        </motion.div>
+// function MetricsSection() {
+//   return (
+//     <Section className="py-28 px-6 overflow-hidden" style={{ background: "#1A1A1A" }}>
+//       <div className="max-w-7xl mx-auto">
+//         <motion.div variants={fadeUp} custom={0} className="text-center mb-16 space-y-4">
+//           <h2
+//             className="text-4xl md:text-5xl font-extrabold tracking-tight"
+//             style={{ color: "#F5F0E8" }}
+//           >
+//             Numbers that{" "}
+//             <span
+//               style={{
+//                 background: "linear-gradient(135deg, #B07D3A, #D4A85A)",
+//                 WebkitBackgroundClip: "text",
+//                 WebkitTextFillColor: "transparent",
+//               }}
+//             >
+//               speak for themselves
+//             </span>
+//           </h2>
+//         </motion.div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {metrics.map(({ value, suffix, label, desc, decimals }, i) => (
-            <motion.div
-              key={label}
-              variants={fadeUp}
-              custom={i + 1}
-              whileHover={{ y: -6, boxShadow: "0 24px 60px rgba(0,0,0,0.5)" }}
-              className="p-8 rounded-3xl border text-center transition-all duration-300"
-              style={{ background: "#222222", borderColor: "#2A2A2A" }}
-            >
-              <div
-                className="text-5xl font-extrabold mb-2 tabular-nums"
-                style={{
-                  background: "linear-gradient(135deg, #B07D3A, #D4A85A)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                }}
-              >
-                <AnimatedCounter target={value} suffix={suffix} decimals={decimals} />
-              </div>
-              <div className="text-base font-bold mb-1" style={{ color: "#F5F0E8" }}>
-                {label}
-              </div>
-              <div className="text-xs" style={{ color: "#78716C" }}>
-                {desc}
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </Section>
-  );
-}
+//         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+//           {metrics.map(({ value, suffix, label, desc, decimals }, i) => (
+//             <motion.div
+//               key={label}
+//               variants={fadeUp}
+//               custom={i + 1}
+//               whileHover={{ y: -6, boxShadow: "0 24px 60px rgba(0,0,0,0.5)" }}
+//               className="p-8 rounded-3xl border text-center transition-all duration-300"
+//               style={{ background: "#222222", borderColor: "#2A2A2A" }}
+//             >
+//               <div
+//                 className="text-5xl font-extrabold mb-2 tabular-nums"
+//                 style={{
+//                   background: "linear-gradient(135deg, #B07D3A, #D4A85A)",
+//                   WebkitBackgroundClip: "text",
+//                   WebkitTextFillColor: "transparent",
+//                 }}
+//               >
+//                 <AnimatedCounter target={value} suffix={suffix} decimals={decimals} />
+//               </div>
+//               <div className="text-base font-bold mb-1" style={{ color: "#F5F0E8" }}>
+//                 {label}
+//               </div>
+//               <div className="text-xs" style={{ color: "#78716C" }}>
+//                 {desc}
+//               </div>
+//             </motion.div>
+//           ))}
+//         </div>
+//       </div>
+//     </Section>
+//   );
+// }
 
 /* ══════════════════════════════════════════
    CTA SECTION
@@ -1162,7 +1162,7 @@ export default function LandingPage() {
       <ProblemsSection />
       <SolutionsSection />
       <ProductShowcaseSection onCTA={goToSignIn} />
-      <MetricsSection />
+      {/* <MetricsSection /> */}
       <CTASection onCTA={goToSignIn} />
       <Footer />
     </div>
