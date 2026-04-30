@@ -17,8 +17,11 @@ const itemVariants = {
   show: { opacity: 1, x: 0, transition: { duration: 0.4 } },
 };
 
+const ITEMS_PER_PAGE = 8;
+
 const AlertsScreen = () => {
   const [filter, setFilter] = useState<Filter>("critical");
+  const [currentPage, setCurrentPage] = useState(1);
   const { criticalAlerts, warningAlerts, resolvedCount, resolveAlert, resolveWarning, openPOForItem, placeInsightOrder } = useApp();
 
   const [orderModal, setOrderModal] = useState<{ alert: StockAlert; defaultQty: number } | null>(null);
@@ -52,6 +55,19 @@ const AlertsScreen = () => {
     }
   };
 
+  const allFilteredAlerts = filter === "all" 
+    ? [...criticalAlerts, ...warningAlerts] 
+    : filter === "critical" ? criticalAlerts : warningAlerts;
+
+  const totalPages = Math.ceil(allFilteredAlerts.length / ITEMS_PER_PAGE);
+  const displayedAlerts = allFilteredAlerts.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+
+  // Reset page when filter changes
+  const handleFilterChange = (newFilter: Filter) => {
+    setFilter(newFilter);
+    setCurrentPage(1);
+  };
+
   return (
     <div>
       <div className="mb-8">
@@ -66,19 +82,19 @@ const AlertsScreen = () => {
         animate={{ opacity: 1 }}
         transition={{ duration: 0.4 }}
       >
-        <button onClick={() => setFilter("critical")} className={`flex items-center gap-2 transition-colors ${filter === "critical" ? "text-foreground font-semibold" : "text-muted-foreground hover:text-foreground"}`}>
+        <button onClick={() => handleFilterChange("critical")} className={`flex items-center gap-2 transition-colors ${filter === "critical" ? "text-foreground font-semibold" : "text-muted-foreground hover:text-foreground"}`}>
           <div className="h-2 w-2 rounded-full bg-red-500 shrink-0" />
           <span>{criticalAlerts.length} urgent</span>
         </button>
         <div className="h-1 w-1 rounded-full bg-border hidden sm:block" />
-        <button onClick={() => setFilter("warning")} className={`flex items-center gap-2 transition-colors ${filter === "warning" ? "text-foreground font-semibold" : "text-muted-foreground hover:text-foreground"}`}>
+        <button onClick={() => handleFilterChange("warning")} className={`flex items-center gap-2 transition-colors ${filter === "warning" ? "text-foreground font-semibold" : "text-muted-foreground hover:text-foreground"}`}>
           <div className="h-2 w-2 rounded-full bg-amber-400 shrink-0" />
           <span>{warningAlerts.length} to watch</span>
         </button>
         <div className="h-1 w-1 rounded-full bg-border hidden sm:block" />
         <div className="flex items-center gap-2 text-muted-foreground">
           <div className="h-2 w-2 rounded-full bg-emerald-500 shrink-0" />
-          <span>{resolvedCount} handled by AI today</span>
+          <span>{resolvedCount} Fulfilled Today</span>
         </div>
       </motion.div>
 
@@ -91,142 +107,96 @@ const AlertsScreen = () => {
         ].map(tab => (
           <button
             key={tab.id}
-            onClick={() => setFilter(tab.id)}
-            className={`px-3.5 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-              filter === tab.id
+            onClick={() => handleFilterChange(tab.id)}
+            className={`px-3.5 py-1.5 rounded-lg text-sm font-medium transition-colors ${filter === tab.id
                 ? "bg-foreground text-background"
                 : "bg-muted text-muted-foreground hover:bg-muted/80"
-            }`}
+              }`}
           >
             {tab.label}
           </button>
         ))}
       </div>
 
-      {/* Critical Alerts */}
-      <AnimatePresence>
-        {(filter === "critical" || filter === "all") && criticalAlerts.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            className="mb-6"
-          >
-            <h2 className="text-sm font-semibold text-muted-foreground mb-3 flex items-center gap-2">
-              <span className="h-1.5 w-1.5 rounded-full bg-red-500" /> Urgent — act on these today
-            </h2>
-            <motion.div className="space-y-3" variants={containerVariants} initial="hidden" animate="show">
-              {criticalAlerts.map((alert) => (
-                <motion.div
+      {/* Alerts List */}
+      <div className="space-y-4">
+        <AnimatePresence mode="wait">
+          {displayedAlerts.length > 0 ? (
+            <motion.div
+              key={`${filter}-${currentPage}`}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="space-y-3"
+            >
+              {displayedAlerts.map((alert) => (
+                <CollapsibleAlert
                   key={alert.id}
-                  variants={itemVariants}
-                  layout
-                  exit={{ opacity: 0, x: -40, height: 0 }}
-                  className="bg-card border border-border hover:border-primary/20 rounded-xl p-5 transition-colors"
-                >
-                  <div className="flex items-start gap-4">
-                    <span className="text-2xl shrink-0 mt-0.5">{alert.icon}</span>
-                    <div className="flex-1">
-                      <div className="flex items-start justify-between gap-2 mb-1">
-                        <h3 className="font-semibold text-foreground text-sm">{alert.title}</h3>
-                        <span className="text-[10px] font-bold text-red-600 bg-red-50 dark:bg-red-950/30 px-1.5 py-0.5 rounded-md shrink-0">{alert.moneyAtRisk} at risk</span>
-                      </div>
-                      <p className="text-sm text-muted-foreground mb-3 leading-relaxed">{alert.details}</p>
-                      <div className="flex flex-wrap gap-2">
-                        <motion.button
-                          whileHover={{ scale: 1.03 }}
-                          whileTap={{ scale: 0.97 }}
-                          onClick={() => handleAlertAction(alert)}
-                          className="px-3.5 py-1.5 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-semibold text-xs transition-colors"
-                        >
-                          {alert.action} →
-                        </motion.button>
-                        <motion.button
-                          whileHover={{ scale: 1.03 }}
-                          whileTap={{ scale: 0.97 }}
-                          onClick={() => resolveAlert(alert.id, "Got it — AI will remind you tomorrow.")}
-                          className="px-3.5 py-1.5 bg-muted hover:bg-muted/80 text-muted-foreground rounded-lg text-xs transition-colors"
-                        >
-                          Remind me tomorrow
-                        </motion.button>
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
+                  alert={alert}
+                  type={alert.type as "critical" | "warning"}
+                  onAction={() => alert.type === "critical" ? handleAlertAction(alert) : resolveWarning(alert.id, `${alert.action} done!`)}
+                  onResolve={() => alert.type === "critical" 
+                    ? resolveAlert(alert.id, "Got it — AI will remind you tomorrow.") 
+                    : resolveWarning(alert.id, "Noted — AI will keep monitoring.")
+                  }
+                />
               ))}
             </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="flex items-center gap-3 bg-emerald-50/60 dark:bg-emerald-950/10 border border-emerald-200 dark:border-emerald-800/50 rounded-xl px-5 py-4"
+            >
+              <span className="text-xl">✅</span>
+              <div>
+                <p className="font-semibold text-emerald-700 dark:text-emerald-400 text-sm">Nothing here right now</p>
+                <p className="text-xs text-muted-foreground mt-0.5">All problems in this category have been handled.</p>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-      {criticalAlerts.length === 0 && (filter === "critical" || filter === "all") && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="mb-6 flex items-center gap-3 bg-emerald-50/60 dark:bg-emerald-950/10 border border-emerald-200 dark:border-emerald-800/50 rounded-xl px-5 py-4"
-        >
-          <span className="text-xl">✅</span>
-          <div>
-            <p className="font-semibold text-emerald-700 dark:text-emerald-400 text-sm">Nothing urgent right now</p>
-            <p className="text-xs text-muted-foreground mt-0.5">All critical problems have been handled. AI is watching for new ones.</p>
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between pt-6 border-t border-border mt-8">
+            <p className="text-xs text-muted-foreground">
+              Showing <span className="font-medium">{(currentPage - 1) * ITEMS_PER_PAGE + 1}</span> to <span className="font-medium">{Math.min(currentPage * ITEMS_PER_PAGE, allFilteredAlerts.length)}</span> of <span className="font-medium">{allFilteredAlerts.length}</span> alerts
+            </p>
+            <div className="flex items-center gap-2">
+              <button
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage(prev => prev - 1)}
+                className="px-3 py-1.5 rounded-lg border border-border text-xs font-medium hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                Previous
+              </button>
+              <div className="flex items-center gap-1">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`w-8 h-8 rounded-lg text-xs font-bold transition-all ${
+                      currentPage === page 
+                        ? "bg-primary text-primary-foreground" 
+                        : "hover:bg-muted text-muted-foreground"
+                    }`}
+                  >
+                    {page}
+                  </button>
+                ))}
+              </div>
+              <button
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage(prev => prev + 1)}
+                className="px-3 py-1.5 rounded-lg border border-border text-xs font-medium hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                Next
+              </button>
+            </div>
           </div>
-        </motion.div>
-      )}
-
-      {/* Warnings */}
-      <AnimatePresence>
-        {(filter === "warning" || filter === "all") && warningAlerts.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-          >
-            <h2 className="text-sm font-semibold text-muted-foreground mb-3 flex items-center gap-2">
-              <span className="h-1.5 w-1.5 rounded-full bg-amber-400" /> Keep an eye on these
-            </h2>
-            <motion.div className="space-y-3" variants={containerVariants} initial="hidden" animate="show">
-              {warningAlerts.map((alert) => (
-                <motion.div
-                  key={alert.id}
-                  variants={itemVariants}
-                  layout
-                  exit={{ opacity: 0, x: -40, height: 0 }}
-                  className="bg-card border border-border hover:border-amber-200 dark:hover:border-amber-800 rounded-xl p-5 transition-colors"
-                >
-                  <div className="flex items-start gap-4">
-                    <span className="text-2xl shrink-0 mt-0.5">{alert.icon}</span>
-                    <div className="flex-1">
-                      <div className="flex items-start justify-between gap-2 mb-1">
-                        <h3 className="font-semibold text-foreground text-sm">{alert.title}</h3>
-                        <span className="text-[10px] font-bold text-amber-600 bg-amber-50 dark:bg-amber-950/30 px-1.5 py-0.5 rounded-md shrink-0">{alert.moneyAtRisk}</span>
-                      </div>
-                      <p className="text-sm text-muted-foreground mb-3 leading-relaxed">{alert.details}</p>
-                      <div className="flex flex-wrap gap-2">
-                        <motion.button
-                          whileHover={{ scale: 1.03 }}
-                          whileTap={{ scale: 0.97 }}
-                          onClick={() => resolveWarning(alert.id, `${alert.action} done!`)}
-                          className="px-3.5 py-1.5 bg-foreground hover:bg-foreground/90 text-background rounded-lg font-semibold text-xs transition-colors"
-                        >
-                          {alert.action} →
-                        </motion.button>
-                        <motion.button
-                          whileHover={{ scale: 1.03 }}
-                          whileTap={{ scale: 0.97 }}
-                          onClick={() => resolveWarning(alert.id, "Noted — AI will keep monitoring.")}
-                          className="px-3.5 py-1.5 bg-muted hover:bg-muted/80 text-muted-foreground rounded-lg text-xs transition-colors"
-                        >
-                          I know, keep watching
-                        </motion.button>
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </motion.div>
-          </motion.div>
         )}
-      </AnimatePresence>
+      </div>
 
       {/* Order Quantity Modal */}
       <AnimatePresence>
@@ -337,6 +307,108 @@ const AlertsScreen = () => {
         )}
       </AnimatePresence>
     </div>
+  );
+};
+
+const CollapsibleAlert = ({ alert, type, onAction, onResolve }: {
+  alert: StockAlert;
+  type: "critical" | "warning";
+  onAction: () => void;
+  onResolve: () => void;
+}) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  return (
+    <motion.div
+      variants={itemVariants}
+      layout
+      className={`bg-card border border-border overflow-hidden rounded-xl transition-all duration-300 ${
+        isExpanded ? "ring-1 ring-primary/20 shadow-lg" : "hover:border-primary/20 cursor-pointer"
+      }`}
+      onClick={() => !isExpanded && setIsExpanded(true)}
+    >
+      <div className="p-4 flex items-center justify-between gap-4">
+        <div className="flex items-center gap-4 flex-1 min-w-0">
+          <div className="min-w-0 px-1">
+            <h3 className="font-bold text-foreground text-[13px] truncate leading-tight mb-0.5">
+              {alert.title}
+            </h3>
+            <p className="text-[11px] text-muted-foreground truncate">
+              {alert.issue}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3 shrink-0 ml-2">
+          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${
+            type === "critical"
+              ? "text-red-600 bg-red-50 dark:bg-red-950/30 border-red-100 dark:border-red-900/30"
+              : "text-amber-600 bg-amber-50 dark:bg-amber-950/30 border-amber-100 dark:border-amber-900/30"
+          }`}>
+            {alert.moneyAtRisk} {type === "critical" ? "at risk" : ""}
+          </span>
+          <motion.span
+            animate={{ rotate: isExpanded ? 180 : 0 }}
+            className="text-muted-foreground/40 text-xs"
+          >
+            ↓
+          </motion.span>
+        </div>
+      </div>
+
+      <AnimatePresence>
+        {isExpanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+          >
+            <div className="px-4 pb-4 pt-0 border-t border-border/50">
+              <div className="py-4">
+                <p className="text-[13px] text-foreground leading-relaxed bg-secondary/30 p-3 rounded-lg border border-border/40">
+                  {alert.details}
+                </p>
+              </div>
+
+              <div className="flex flex-wrap gap-2 pt-2">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onAction();
+                  }}
+                  className={`px-4 py-2 rounded-lg font-bold text-xs transition-all ${
+                    type === "critical"
+                      ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                      : "bg-foreground text-background hover:bg-foreground/90"
+                  }`}
+                >
+                  {alert.action} →
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onResolve();
+                  }}
+                  className="px-4 py-2 bg-muted hover:bg-muted/80 text-muted-foreground rounded-lg text-xs font-semibold transition-colors"
+                >
+                  {type === "critical" ? "Remind me tomorrow" : "Noted — keep watching"}
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsExpanded(false);
+                  }}
+                  className="px-4 py-2 text-muted-foreground hover:text-foreground text-xs font-medium transition-colors ml-auto"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 };
 

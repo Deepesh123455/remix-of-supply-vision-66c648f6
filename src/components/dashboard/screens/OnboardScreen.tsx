@@ -1,15 +1,15 @@
 import { useState } from "react";
 
 const connectors = [
-  { icon: "📊", name: "Tally Prime", desc: "Auto-sync inventory & ledger", connected: true },
-  { icon: "🧵", name: "Maplemonk", desc: "Apparel ERP & production", connected: false },
-  { icon: "📦", name: "EasyEcom", desc: "Multi-channel order & inventory", connected: false },
-  { icon: "🛒", name: "Shopify / WooCommerce", desc: "Online store inventory", connected: false },
-  { icon: "👗", name: "Unicommerce", desc: "Warehouse & marketplace sync", connected: false },
+  { image: "/tally.png", name: "Tally Prime", desc: "Auto-sync inventory & ledger", connected: true },
+  { image: "/maplemonk_logo.jpg", name: "Maplemonk", desc: "Apparel ERP & production", connected: false },
+  { image: "/Easyecom.png", name: "EasyEcom", desc: "Multi-channel order & inventory", connected: false },
+  { image: "/shopify.png", name: "Shopify", desc: "Online store inventory", connected: false },
+  { image: "/woo.png", name: "WooCommerce", desc: "Online store inventory", connected: false },
+  { image: "/unicommerce.jpg", name: "Unicommerce", desc: "Warehouse & marketplace sync", connected: false },
   { icon: "🛍️", name: "Marketplace", desc: "Amazon, Myntra, Flipkart, Ajio", connected: false },
-  { icon: "📱", name: "WhatsApp Business", desc: "Orders & supplier comms", connected: false },
+  { image: "/wp-bussiness.jpg", name: "WhatsApp Business", desc: "Orders & supplier comms", connected: false },
   { icon: "🧾", name: "GST Portal", desc: "Auto-verify invoices", connected: false },
-  { icon: "🏭", name: "WFX (World Fashion Exchange)", desc: "PLM for apparel manufacturers", connected: false },
 ];
 
 const OnboardScreen = () => {
@@ -34,16 +34,27 @@ const OnboardScreen = () => {
             <button
               key={c.name}
               onClick={() => setConnections(prev => prev.map((v, j) => j === i ? !v : v))}
-              className={`relative p-5 rounded-xl border text-center transition-all hover:-translate-y-0.5 ${
-                connections[i]
-                  ? "border-success bg-success/5 shadow-card"
-                  : "border-border bg-card hover:border-primary/40 hover:bg-primary/5"
-              }`}
+              className={`relative p-5 rounded-xl border border-border bg-card text-center transition-all hover:-translate-y-0.5 min-h-[140px] flex flex-col items-center justify-center hover:border-primary/40 hover:bg-primary/5 ${connections[i] ? "shadow-md ring-1 ring-primary/10" : ""
+                }`}
             >
-              {connections[i] && <span className="absolute top-2.5 right-2.5 text-success text-xs">✓</span>}
-              <div className="text-2xl mb-2">{c.icon}</div>
+              {connections[i] && (
+                <div className="absolute top-2.5 right-2.5 w-5 h-5 bg-success text-white rounded-full flex items-center justify-center shadow-sm">
+                  <span className="text-[10px] font-bold">✓</span>
+                </div>
+              )}
+              <div className="h-10 w-full flex items-center justify-center mb-3">
+                {('image' in c) ? (
+                  <img
+                    src={c.image}
+                    alt={c.name}
+                    className="h-full w-auto max-w-[80%] object-contain filter drop-shadow-sm"
+                  />
+                ) : (
+                  <div className="text-2xl">{c.icon}</div>
+                )}
+              </div>
               <div className="text-xs font-bold text-foreground">{c.name}</div>
-              <div className="text-[11px] text-muted-foreground mt-1">{c.desc}</div>
+              <div className="text-[11px] text-muted-foreground mt-1 line-clamp-2">{c.desc}</div>
             </button>
           ))}
         </div>
@@ -84,20 +95,18 @@ const OnboardScreen = () => {
 
 const ProcessStep = ({ status, name, detail, result }: { status: "done" | "running" | "pending"; name: string; detail: string; result: string }) => (
   <div className="flex items-center gap-3">
-    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs shrink-0 ${
-      status === "done" ? "bg-success/15 text-success" :
-      status === "running" ? "bg-primary/15 text-primary animate-spin" :
-      "bg-secondary border border-border text-muted-foreground"
-    }`}>
+    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs shrink-0 ${status === "done" ? "bg-success/15 text-success" :
+        status === "running" ? "bg-primary/15 text-primary animate-spin" :
+          "bg-secondary border border-border text-muted-foreground"
+      }`}>
       {status === "done" ? "✓" : status === "running" ? "◌" : "○"}
     </div>
     <div className="flex-1">
       <div className="text-xs font-medium text-foreground">{name}</div>
       <div className="text-[11px] text-muted-foreground">{detail}</div>
     </div>
-    <span className={`text-[11px] font-semibold ${
-      status === "done" ? "text-success" : status === "running" ? "text-info" : "text-muted-foreground/50"
-    }`}>{result}</span>
+    <span className={`text-[11px] font-semibold ${status === "done" ? "text-success" : status === "running" ? "text-info" : "text-muted-foreground/50"
+      }`}>{result}</span>
   </div>
 );
 

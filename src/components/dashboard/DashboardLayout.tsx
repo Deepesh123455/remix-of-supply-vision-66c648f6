@@ -1,49 +1,28 @@
 import { useState, useEffect, useRef } from "react";
+import { useLocation, Outlet, useNavigate } from "react-router-dom";
 import { AppProvider, useApp } from "@/context/AppContext";
 import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
-import DashboardScreen from "./screens/DashboardScreen";
-import AlertsScreen from "./screens/AlertsScreen";
-import InventoryScreen from "./screens/InventoryScreen";
-import ForecastScreen from "./screens/ForecastScreen";
-import SuppliersScreen from "./screens/SuppliersScreen";
-import AgentsScreen from "./screens/AgentsScreen";
-import WhatsAppScreen from "./screens/WhatsAppScreen";
-import OnboardScreen from "./screens/OnboardScreen";
-import TransferScreen from "./screens/TransferScreen";
-import OrderHistoryScreen from "./screens/OrderHistoryScreen";
 import POModal from "./POModal";
 
-export type ScreenName = "dashboard" | "alerts" | "inventory" | "forecast" | "suppliers" | "agents" | "whatsapp" | "onboard" | "transfer" | "orderHistory";
+export type ScreenName = "alerts" | "inventory" | "forecast" | "suppliers" | "agents" | "whatsapp" | "onboard" | "transfer" | "orderHistory";
 
 const Inner = () => {
-  const [activeScreen, setActiveScreen] = useState<ScreenName>("dashboard");
+  const location = useLocation();
+  const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { metrics, criticalAlerts, transfers, unreadOrderCount, resetOrderCount } = useApp();
   const pendingTransferCount = transfers.filter(t => t.status === "pending").length;
   const mainRef = useRef<HTMLElement>(null);
 
+  // Derive active screen from URL
+  const activeScreen = (location.pathname.split("/").pop() as ScreenName) || "alerts";
+
   useEffect(() => {
     if (mainRef.current) {
       mainRef.current.scrollTop = 0;
     }
-  }, [activeScreen]);
-
-  const renderScreen = () => {
-    switch (activeScreen) {
-      case "dashboard":  return <DashboardScreen onNavigate={setActiveScreen} />;
-      case "alerts":     return <AlertsScreen />;
-      case "inventory":  return <InventoryScreen onNavigate={setActiveScreen} />;
-      case "forecast":   return <ForecastScreen />;
-      case "suppliers":  return <SuppliersScreen />;
-      case "agents":     return <AgentsScreen />;
-      case "whatsapp":   return <WhatsAppScreen />;
-      case "onboard":    return <OnboardScreen />;
-      case "transfer":     return <TransferScreen />;
-      case "orderHistory": return <OrderHistoryScreen />;
-      default:             return <DashboardScreen onNavigate={setActiveScreen} />;
-    }
-  };
+  }, [location.pathname]);
 
   return (
     <div className="h-screen flex flex-col bg-background">
@@ -53,7 +32,7 @@ const Inner = () => {
         <Sidebar
           activeScreen={activeScreen}
           onNavigate={(screen) => {
-            setActiveScreen(screen);
+            navigate(`/dashboard/${screen}`);
             setSidebarOpen(false);
             if (screen === "orderHistory") resetOrderCount();
           }}
@@ -73,9 +52,9 @@ const Inner = () => {
               </span>
               <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-widest">Live Sync</span>
             </div>
-            
+
             <div className="h-4 w-px bg-border/60 mx-1 md:mx-2 hidden sm:block shrink-0"></div>
-            
+
             <div className="flex items-center gap-3 overflow-x-auto no-scrollbar pb-1 -mb-1">
               <TickerItem label="Stock Value" value={metrics.totalInventory} />
               <TickerItem label="Sales Today" value={metrics.sellThroughToday} />
@@ -85,7 +64,7 @@ const Inner = () => {
           </div>
 
           <div className="p-4 md:p-6 animate-in fade-in duration-300">
-            {renderScreen()}
+            <Outlet />
           </div>
         </main>
       </div>
@@ -102,11 +81,10 @@ const DashboardLayout = () => (
 );
 
 const TickerItem = ({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) => (
-  <div className={`flex items-center gap-2 whitespace-nowrap px-3.5 py-1.5 rounded-full transition-all duration-300 border ${
-    highlight 
-      ? "bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800 shadow-sm" 
-      : "bg-white dark:bg-card border-border/50 shadow-sm hover:border-border hover:shadow"
-  }`}>
+  <div className={`flex items-center gap-2 whitespace-nowrap px-3.5 py-1.5 rounded-full transition-all duration-300 border ${highlight
+    ? "bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800 shadow-sm"
+    : "bg-white dark:bg-card border-border/50 shadow-sm hover:border-border hover:shadow"
+    }`}>
     <span className={`text-[11px] font-medium ${highlight ? "text-amber-700 dark:text-amber-400" : "text-muted-foreground"}`}>
       {label}
     </span>
@@ -117,3 +95,5 @@ const TickerItem = ({ label, value, highlight }: { label: string; value: string;
 );
 
 export default DashboardLayout;
+
+

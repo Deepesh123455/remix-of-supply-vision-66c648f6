@@ -25,6 +25,9 @@ const InventoryScreen = ({ onNavigate }: Props) => {
   const [activeTab, setActiveTab] = useState("all");
   const [search, setSearch] = useState("");
 
+  const ITEMS_PER_PAGE = 8;
+  const [currentPage, setCurrentPage] = useState(1);
+
   const filteredItems = inventory.filter(item => {
     const matchesTab =
       activeTab === "all" ? true :
@@ -37,6 +40,14 @@ const InventoryScreen = ({ onNavigate }: Props) => {
       item.category.toLowerCase().includes(search.toLowerCase());
     return matchesTab && matchesSearch;
   });
+
+  const totalPages = Math.ceil(filteredItems.length / ITEMS_PER_PAGE);
+  const displayedItems = filteredItems.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+
+  const handleTabChange = (val: string) => {
+    setActiveTab(val);
+    setCurrentPage(1);
+  };
 
   const criticalCount = inventory.filter(i => i.status === "critical").length;
   const warningCount = inventory.filter(i => i.status === "warning").length;
@@ -115,7 +126,7 @@ const InventoryScreen = ({ onNavigate }: Props) => {
                   placeholder="Search products..."
                   className="pl-9 h-9"
                   value={search}
-                  onChange={e => setSearch(e.target.value)}
+                  onChange={e => { setSearch(e.target.value); setCurrentPage(1); }}
                 />
               </div>
               <div className="flex items-center border rounded-md p-1 bg-muted/50">
@@ -129,7 +140,7 @@ const InventoryScreen = ({ onNavigate }: Props) => {
             </div>
           </div>
 
-          <Tabs defaultValue="all" className="w-full mt-4" onValueChange={setActiveTab}>
+          <Tabs defaultValue="all" className="w-full mt-4" value={activeTab} onValueChange={handleTabChange}>
             <TabsList className="flex flex-wrap h-auto w-full sm:w-auto justify-start gap-1">
               <TabsTrigger value="all">All</TabsTrigger>
               <TabsTrigger value="critical" className="data-[state=active]:text-destructive">Running Out</TabsTrigger>
@@ -142,7 +153,7 @@ const InventoryScreen = ({ onNavigate }: Props) => {
         <CardContent className="px-0 sm:px-6 pb-6">
           <AnimatePresence mode="wait">
             {viewMode === "list" ? (
-              <motion.div key="list" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              <motion.div key={`${activeTab}-list-${currentPage}`} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
                 <div className="border rounded-md overflow-hidden">
                   <div className="overflow-x-auto">
                     <Table>
@@ -156,7 +167,7 @@ const InventoryScreen = ({ onNavigate }: Props) => {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {filteredItems.map(item => (
+                        {displayedItems.map(item => (
                           <TableRow key={item.id} className="group cursor-pointer hover:bg-muted/20">
                             <TableCell>
                               <div className="flex flex-col">
@@ -195,27 +206,58 @@ const InventoryScreen = ({ onNavigate }: Props) => {
                     </Table>
                   </div>
                 </div>
-                {filteredItems.length === 0 && (
-                  <div className="text-center py-12 text-muted-foreground">
-                    <p className="text-4xl mb-3">🔍</p>
-                    <p className="font-medium">No products found for "{search}"</p>
-                  </div>
-                )}
               </motion.div>
             ) : (
               <motion.div
-                key="grid"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
+                key={`${activeTab}-grid-${currentPage}`}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
                 className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
               >
-                {filteredItems.map(item => (
+                {displayedItems.map(item => (
                   <InventoryCard key={item.id} item={item} onAction={() => handleAction(item)} />
                 ))}
               </motion.div>
             )}
           </AnimatePresence>
+
+          {filteredItems.length === 0 && (
+            <div className="text-center py-12 text-muted-foreground">
+              <p className="text-4xl mb-3">🔍</p>
+              <p className="font-medium">No products found</p>
+            </div>
+          )}
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between mt-8 pt-6 border-t border-border/50">
+              <p className="text-xs text-muted-foreground font-medium">
+                Showing <span className="text-foreground">{(currentPage - 1) * ITEMS_PER_PAGE + 1}</span> to <span className="text-foreground">{Math.min(currentPage * ITEMS_PER_PAGE, filteredItems.length)}</span> of <span className="text-foreground">{filteredItems.length}</span> items
+              </p>
+              <div className="flex items-center gap-2">
+                <Button variant="outline" size="sm" className="h-8 px-3 text-xs" onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))} disabled={currentPage === 1}>
+                  Previous
+                </Button>
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                    <Button
+                      key={page}
+                      variant={currentPage === page ? "default" : "ghost"}
+                      size="sm"
+                      className="h-8 w-8 text-xs p-0 font-bold"
+                      onClick={() => setCurrentPage(page)}
+                    >
+                      {page}
+                    </Button>
+                  ))}
+                </div>
+                <Button variant="outline" size="sm" className="h-8 px-3 text-xs" onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))} disabled={currentPage === totalPages}>
+                  Next
+                </Button>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 

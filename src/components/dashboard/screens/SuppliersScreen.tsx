@@ -16,6 +16,8 @@ import { COMMS_LOG } from "@/data/appData";
 
 const SuppliersScreen = () => {
   const { suppliers, toggleSupplierAutoPilot, metrics } = useApp();
+  const ITEMS_PER_PAGE = 8;
+  const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState("");
 
   const filtered = suppliers.filter(s =>
@@ -23,6 +25,9 @@ const SuppliersScreen = () => {
     s.name.toLowerCase().includes(search.toLowerCase()) ||
     s.category.toLowerCase().includes(search.toLowerCase())
   );
+
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
+  const displayedSuppliers = filtered.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
   const atRiskCount = suppliers.filter(s => s.performance === "At Risk" || s.performance === "Critical").length;
   const autoPilotOn = suppliers.filter(s => s.autoPilot).length;
@@ -91,7 +96,7 @@ const SuppliersScreen = () => {
                   placeholder="Search vendor..."
                   className="pl-8 h-8 text-xs w-[200px]"
                   value={search}
-                  onChange={e => setSearch(e.target.value)}
+                  onChange={e => { setSearch(e.target.value); setCurrentPage(1); }}
                 />
               </div>
             </div>
@@ -108,7 +113,7 @@ const SuppliersScreen = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filtered.map(s => (
+                  {displayedSuppliers.map(s => (
                     <TableRow
                       key={s.id}
                       className="hover:bg-muted/10 transition-colors cursor-pointer group"
@@ -126,9 +131,9 @@ const SuppliersScreen = () => {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Badge variant="outline" className={`text-[10px] py-0 h-5 ${s.status.includes("Late") ? "border-destructive/30 text-destructive bg-destructive/5" :
-                            s.status.includes("Review") ? "border-amber-300 text-amber-700 bg-amber-50" :
-                              "border-emerald-200 text-emerald-700 bg-emerald-50"
+                        <Badge variant="outline" className={`text-[10px] py-0 h-5 ${s.status.includes("Late") || s.status.includes("Critical") ? "border-destructive/30 text-destructive bg-destructive/5" :
+                          s.status.includes("Review") || s.status.includes("Action Required") ? "border-amber-300 text-amber-700 bg-amber-50" :
+                            "border-emerald-200 text-emerald-700 bg-emerald-50"
                           }`}>
                           {s.status}
                         </Badge>
@@ -146,8 +151,8 @@ const SuppliersScreen = () => {
                       </TableCell>
                       <TableCell className="text-right pr-6">
                         <span className={`text-[11px] font-bold uppercase tracking-wide ${s.performance === "Exceptional" ? "text-emerald-600" :
-                            s.performance === "Reliable" ? "text-primary" :
-                              s.performance === "At Risk" ? "text-amber-600" : "text-destructive"
+                          s.performance === "Reliable" ? "text-primary" :
+                            s.performance === "At Risk" ? "text-amber-600" : "text-destructive"
                           }`}>
                           {s.performance}
                         </span>
@@ -157,6 +162,23 @@ const SuppliersScreen = () => {
                 </TableBody>
               </Table>
             </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-between p-4 border-t border-border/50 bg-muted/5">
+                <p className="text-[10px] text-muted-foreground font-medium">
+                  Showing <span className="text-foreground">{(currentPage - 1) * ITEMS_PER_PAGE + 1}</span> to <span className="text-foreground">{Math.min(currentPage * ITEMS_PER_PAGE, filtered.length)}</span> of <span className="text-foreground">{filtered.length}</span> vendors
+                </p>
+                <div className="flex items-center gap-2">
+                  <Button variant="outline" size="sm" className="h-7 px-3 text-[10px]" onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))} disabled={currentPage === 1}>
+                    Previous
+                  </Button>
+                  <Button variant="outline" size="sm" className="h-7 px-3 text-[10px]" onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))} disabled={currentPage === totalPages}>
+                    Next
+                  </Button>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -220,7 +242,7 @@ const SuppliersScreen = () => {
                   >
                     <div className="flex justify-between items-center mb-1">
                       <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${log.type === "ALERT" ? "bg-destructive/10 text-destructive" :
-                          log.type === "INBOUND" ? "bg-blue-100 text-blue-700" : "bg-emerald-100 text-emerald-700"
+                        log.type === "INBOUND" ? "bg-blue-100 text-blue-700" : "bg-emerald-100 text-emerald-700"
                         }`}>
                         {log.type === "OUTBOUND" ? "SENT" : log.type === "INBOUND" ? "RECEIVED" : "ALERT"}
                       </span>

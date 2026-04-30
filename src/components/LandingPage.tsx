@@ -164,24 +164,22 @@ function Navbar({ onCTA }: { onCTA: () => void }) {
       initial={{ y: -80, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.6, ease: EASE }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled
-          ? "bg-white/90 backdrop-blur-xl border-b border-[#E8E4DE] shadow-sm"
-          : "bg-transparent"
-      }`}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled
+        ? "bg-white/90 backdrop-blur-xl border-b border-[#E8E4DE] shadow-sm"
+        : "bg-transparent"
+        }`}
     >
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
         {/* logo */}
-        <div className="flex items-center gap-2">
-          <div
-            className="w-8 h-8 rounded-lg flex items-center justify-center"
-            style={{ background: "linear-gradient(135deg, #B07D3A, #D4A85A)" }}
-          >
-            <Sparkles className="w-4 h-4 text-white" />
-          </div>
+        <div className="flex flex-col ">
+
           <span className="text-lg font-bold tracking-tight" style={{ color: "#1C1917" }}>
             SupplyVision
           </span>
+          <span className="text-xs text-zinc-500 ">
+            Powered by InvisibleCTO
+          </span>
+
         </div>
 
         {/* actions */}
@@ -236,21 +234,7 @@ function HeroSection({ onCTA }: { onCTA: () => void }) {
       <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-16 items-center w-full py-20">
         {/* left copy */}
         <motion.div style={{ y: y1 }} className="space-y-8 relative z-10">
-          <motion.div
-            variants={fadeUp}
-            custom={0}
-            initial="hidden"
-            animate="visible"
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-semibold"
-            style={{
-              background: "rgba(176,125,58,0.1)",
-              borderColor: "rgba(176,125,58,0.3)",
-              color: "#B07D3A",
-            }}
-          >
-            <Zap className="w-3 h-3" />
-            AI-Powered Retail Intelligence
-          </motion.div>
+
 
           <motion.h1
             variants={fadeUp}
@@ -499,22 +483,13 @@ const problems = [
 
 function ProblemsSection() {
   return (
-    <Section className="py-28 px-6" style={{ background: "#1A1A1A" }}>
-      <div className="max-w-7xl mx-auto">
-        <motion.div variants={fadeUp} custom={0} className="text-center mb-16 space-y-4">
-          <div
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold border"
-            style={{
-              color: "#D4A85A",
-              borderColor: "rgba(212,168,90,0.3)",
-              background: "rgba(212,168,90,0.1)",
-            }}
-          >
-            <AlertTriangle className="w-3 h-3" /> The Problem
-          </div>
+    <Section className="py-16 px-6" style={{ background: "#F9F7F5" }}>
+      <div className="max-w-6xl mx-auto">
+        <motion.div variants={fadeUp} custom={0} className="text-center mb-10 space-y-3">
+
           <h2
-            className="text-4xl md:text-5xl font-extrabold tracking-tight"
-            style={{ color: "#F5F0E8" }}
+            className="text-3xl md:text-4xl font-extrabold tracking-tight"
+            style={{ color: "#1C1917" }}
           >
             Retail is hard. We make it{" "}
             <span
@@ -527,49 +502,65 @@ function ProblemsSection() {
               manageable.
             </span>
           </h2>
-          <p className="text-lg max-w-xl mx-auto" style={{ color: "#78716C" }}>
-            Every retail operation battles the same costly inefficiencies.
+          <p className="text-sm max-w-md mx-auto" style={{ color: "#78716C" }}>
+            Eliminate the operational bottlenecks that drain your bottom line.
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
           {problems.map(({ icon: Icon, title, desc }, i) => (
             <motion.div
               key={title}
               variants={fadeUp}
               custom={i + 1}
-              whileHover={{ y: -6, boxShadow: "0 20px 60px rgba(0,0,0,0.4)" }}
-              className="p-6 rounded-2xl border cursor-pointer transition-all duration-300 group"
-              style={{ background: "#222222", borderColor: "#2A2A2A" }}
+              whileHover={{ y: -3, boxShadow: "0 12px 30px rgba(0,0,0,0.04)", borderColor: "#D4A85A" }}
+              className="p-5 rounded-xl border bg-white cursor-pointer transition-all duration-300 group relative"
+              style={{
+                borderColor: "#E8E4DE"
+              }}
             >
               <div
-                className="w-11 h-11 rounded-xl flex items-center justify-center mb-4 transition-all duration-300 group-hover:scale-110"
-                style={{ background: "rgba(176,125,58,0.15)" }}
+                className="w-9 h-9 rounded-lg flex items-center justify-center mb-4 border transition-all duration-300 group-hover:bg-[#B07D3A] group-hover:border-[#B07D3A]"
+                style={{
+                  background: "#F5F2ED",
+                  borderColor: "#E8E4DE"
+                }}
               >
-                <Icon className="w-5 h-5" style={{ color: "#D4A85A" }} />
+                <Icon className="w-3.5 h-3.5 transition-colors duration-300 group-hover:text-white" style={{ color: "#B07D3A" }} />
               </div>
-              <h3 className="text-base font-bold mb-2" style={{ color: "#F5F0E8" }}>
+              <h3 className="text-sm font-bold mb-1.5" style={{ color: "#1C1917" }}>
                 {title}
               </h3>
-              <p className="text-sm leading-relaxed" style={{ color: "#78716C" }}>
+              <p className="text-xs leading-relaxed" style={{ color: "#78716C" }}>
                 {desc}
               </p>
             </motion.div>
           ))}
 
-          {/* gradient CTA card */}
+          {/* premium CTA card */}
           <motion.div
             variants={fadeUp}
             custom={problems.length + 1}
-            whileHover={{ y: -6 }}
-            className="p-6 rounded-2xl flex flex-col items-start justify-between cursor-pointer"
-            style={{ background: "linear-gradient(135deg, #B07D3A, #D4A85A)" }}
+            whileHover={{ y: -3, boxShadow: "0 12px 40px rgba(176,125,58,0.25)" }}
+            className="p-5 rounded-xl flex flex-col items-start justify-between cursor-pointer border relative overflow-hidden group shadow-md"
+            style={{
+              background: "linear-gradient(145deg, #B07D3A, #D4A85A)",
+              borderColor: "#B07D3A"
+            }}
           >
-            <p className="text-base font-bold text-white mb-4">
-              Sound familiar? We built the solution.
-            </p>
-            <div className="flex items-center gap-2 text-white/90 text-sm font-semibold">
-              See how it works <ArrowRight className="w-4 h-4" />
+            <div className="absolute -top-4 -right-4 p-4 opacity-10 transition-transform duration-700 group-hover:scale-125 group-hover:-rotate-12">
+              <Sparkles className="w-20 h-20 text-white" />
+            </div>
+            <div>
+              <p className="text-sm font-bold text-white mb-1">
+                Sound familiar?
+              </p>
+              <p className="text-[11px] text-white/90 font-medium leading-tight">
+                Our AI handles the complexity so you can focus on growth.
+              </p>
+            </div>
+            <div className="mt-4 flex items-center gap-2 text-white text-[11px] font-bold bg-white/10 px-3 py-1.5 rounded-lg border border-white/20 group-hover:bg-white/25 transition-all">
+              Explore Solution <ArrowRight className="w-3 h-3 transition-transform group-hover:translate-x-1" />
             </div>
           </motion.div>
         </div>
@@ -577,6 +568,9 @@ function ProblemsSection() {
     </Section>
   );
 }
+
+
+
 
 /* ══════════════════════════════════════════
    SOLUTIONS SECTION
@@ -613,16 +607,7 @@ function SolutionsSection() {
     <Section className="py-28 px-6" style={{ background: "#F0EDE8" }}>
       <div className="max-w-7xl mx-auto">
         <motion.div variants={fadeUp} custom={0} className="text-center mb-16 space-y-4">
-          <div
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold border"
-            style={{
-              color: "#4A7C59",
-              borderColor: "rgba(74,124,89,0.3)",
-              background: "rgba(74,124,89,0.1)",
-            }}
-          >
-            <CheckCircle className="w-3 h-3" /> The Solution
-          </div>
+
           <h2
             className="text-4xl md:text-5xl font-extrabold tracking-tight"
             style={{ color: "#1C1917" }}
@@ -1067,12 +1052,6 @@ function CTASection({ onCTA }: { onCTA: () => void }) {
               />
 
               <div className="relative z-10 space-y-6">
-                <div
-                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold"
-                  style={{ background: "rgba(176,125,58,0.1)", color: "#B07D3A" }}
-                >
-                  <Sparkles className="w-3 h-3" /> Get started today
-                </div>
 
                 <h2
                   className="text-4xl md:text-5xl font-extrabold tracking-tight"
@@ -1111,7 +1090,7 @@ function CTASection({ onCTA }: { onCTA: () => void }) {
                   </motion.button>
 
                   <div className="flex flex-wrap items-center justify-center gap-5 text-xs" style={{ color: "#78716C" }}>
-                    {["No credit card required", "Setup in 24 hours", "Free trial"].map((t) => (
+                    {["No credit card required", "0 Setup", "Free trial"].map((t) => (
                       <div key={t} className="flex items-center gap-1.5">
                         <CheckCircle className="w-3.5 h-3.5" style={{ color: "#4A7C59" }} />
                         {t}

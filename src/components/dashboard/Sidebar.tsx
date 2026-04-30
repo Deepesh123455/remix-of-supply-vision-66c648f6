@@ -19,7 +19,6 @@ const Sidebar = ({ activeScreen, onNavigate, mobileOpen, onClose, alertCount = 0
       {
         section: "Overview",
         items: [
-          { icon: "◈", label: "Dashboard", screen: "dashboard" },
           {
             icon: "⚡",
             label: "Alerts",
@@ -81,16 +80,16 @@ const Sidebar = ({ activeScreen, onNavigate, mobileOpen, onClose, alertCount = 0
                   key={item.screen}
                   onClick={() => onNavigate(item.screen)}
                   className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[13px] transition-colors mb-0.5 ${activeScreen === item.screen
-                      ? "bg-sidebar-accent text-primary font-medium border border-primary/20"
-                      : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+                    ? "bg-sidebar-accent text-primary font-medium border border-primary/20"
+                    : "text-muted-foreground hover:bg-secondary hover:text-foreground"
                     }`}
                 >
                   <span className="w-5 text-center text-sm">{item.icon}</span>
                   <span>{item.label}</span>
                   {item.badge && (
                     <span className={`ml-auto text-[9px] font-semibold px-1.5 py-0.5 rounded-full text-primary-foreground ${item.badgeColor === "success" ? "bg-success" :
-                        item.badgeColor === "warning" ? "bg-warning text-foreground" :
-                          "bg-primary"
+                      item.badgeColor === "warning" ? "bg-warning text-foreground" :
+                        "bg-primary"
                       }`}>
                       {item.badge}
                     </span>
