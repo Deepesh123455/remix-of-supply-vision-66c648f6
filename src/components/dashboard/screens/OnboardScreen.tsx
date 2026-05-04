@@ -20,15 +20,15 @@ const OnboardScreen = () => {
     <div>
       <div className="text-center pt-8 pb-8">
         <h1 className="text-3xl font-extrabold text-text-heading tracking-tight leading-tight mb-3">
-          Plug in your data.<br /><em className="text-primary font-bold not-italic">Boom.</em> AI takes over.
+          Plug in your data.<br /><em className="text-primary font-bold not-italic">Boom.</em> Agent takes over.
         </h1>
         <p className="text-sm text-muted-foreground max-w-lg mx-auto leading-relaxed">
-          Connect your existing tools or drop your Excel files. No technical knowledge needed. Our AI reads your data, understands your business, and starts working immediately.
+          Connect your existing tools or drop your Excel files. No technical knowledge needed. Our Agent reads your data, understands your business, and starts working immediately.
         </p>
       </div>
 
       <div className="max-w-2xl mx-auto">
-        <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3">Step 1 — Connect Your Software</h3>
+        <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3">Connect Your Software</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mb-8">
           {connectors.map((c, i) => (
             <button
@@ -59,7 +59,7 @@ const OnboardScreen = () => {
           ))}
         </div>
 
-        <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3">Step 2 — Or Just Drop Your Files</h3>
+        <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3">Or Just Drop Your Files</h3>
 
         {!uploaded ? (
           <div
@@ -96,8 +96,8 @@ const OnboardScreen = () => {
 const ProcessStep = ({ status, name, detail, result }: { status: "done" | "running" | "pending"; name: string; detail: string; result: string }) => (
   <div className="flex items-center gap-3">
     <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs shrink-0 ${status === "done" ? "bg-success/15 text-success" :
-        status === "running" ? "bg-primary/15 text-primary animate-spin" :
-          "bg-secondary border border-border text-muted-foreground"
+      status === "running" ? "bg-primary/15 text-primary animate-spin" :
+        "bg-secondary border border-border text-muted-foreground"
       }`}>
       {status === "done" ? "✓" : status === "running" ? "◌" : "○"}
     </div>

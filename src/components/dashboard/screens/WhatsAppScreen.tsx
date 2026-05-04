@@ -218,16 +218,16 @@ const WhatsAppScreen = () => {
         </Card>
 
         {/* ── Right Panel ── */}
-        <div className="lg:col-span-2 flex flex-col gap-5">
+        <div className="lg:col-span-2 flex flex-col gap-5 h-[80vh] min-h-[500px] max-h-[700px]">
 
           {/* Live AI Activity */}
-          <Card className="border-border shadow-sm overflow-hidden">
-            <CardHeader className="pb-3 pt-4 px-5">
+          <Card className="border-border shadow-sm overflow-hidden flex flex-col flex-1">
+            <CardHeader className="pb-3 pt-4 px-5 shrink-0">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="relative">
                     <Bot className="w-4 h-4 text-primary" />
-                    <span className="absolute -top-0.5 -right-0.5 h-2 w-2 bg-emerald-500 rounded-full animate-pulse" />
+
                   </div>
                   <CardTitle className="text-sm font-bold">AI Working Right Now</CardTitle>
                 </div>
@@ -235,7 +235,7 @@ const WhatsAppScreen = () => {
               </div>
               <p className="text-[11px] text-muted-foreground mt-1">Every action your AI took in the last hour</p>
             </CardHeader>
-            <CardContent className="px-5 pb-4 pt-0">
+            <CardContent className="px-5 pb-4 pt-0 flex-1 overflow-y-auto">
               <div className="space-y-3">
                 {LIVE_ACTIVITY.map((item, i) => (
                   <motion.div
@@ -253,58 +253,50 @@ const WhatsAppScreen = () => {
                   </motion.div>
                 ))}
               </div>
+            </CardContent>
+            <div className="px-5 pb-4 pt-0 shrink-0">
               <button
                 onClick={() => toast.info("Full AI activity log — coming soon.")}
-                className="mt-4 w-full text-[10px] font-bold text-primary flex items-center justify-center gap-1 hover:gap-2 transition-all"
+                className="w-full text-[10px] font-bold text-primary flex items-center justify-center gap-1 hover:gap-2 transition-all"
               >
                 See Full Activity Log <ArrowUpRight className="w-3 h-3" />
               </button>
+            </div>
+          </Card>
+
+          {/* What You Can Do */}
+          <Card className="border-border shadow-sm overflow-hidden flex flex-col flex-1">
+            <CardHeader className="pb-3 pt-4 px-5 shrink-0">
+              <div className="flex items-center gap-2">
+                <Zap className="w-4 h-4 text-primary" />
+                <CardTitle className="text-sm font-bold">What You Can Do</CardTitle>
+              </div>
+              <p className="text-[11px] text-muted-foreground mt-1">Powerful features, one message away.</p>
+            </CardHeader>
+            <CardContent className="px-5 pb-6 flex-1 overflow-y-auto">
+              <div className="space-y-4">
+                {[
+                  "Monitor live stock and inventory levels across all your stores and warehouses instantly.",
+                  "Get real-time updates on production status and factory timelines with zero manual follow-up.",
+                  "Track active shipments and delivery ETAs with live GPS-linked logistics data.",
+                  "Forecast future demand and receive AI-driven reorder suggestions for fast-moving items.",
+                  "Manage your entire supply chain using natural language commands in English or Hindi."
+                ].map((text, i) => (
+                  <div key={i} className="flex gap-3">
+                    <span className="flex items-center justify-center h-5 w-5 rounded-full bg-primary/10 text-primary text-[10px] font-bold shrink-0">
+                      {i + 1}
+                    </span>
+                    <p className="text-[12px] leading-relaxed text-foreground/80">{text}</p>
+                  </div>
+                ))}
+              </div>
             </CardContent>
           </Card>
 
-          {/* What Can You Ask */}
-          <Card className="border-border shadow-sm overflow-hidden">
-            <CardHeader className="pb-2 pt-4 px-5">
-              <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-primary" />
-                <CardTitle className="text-sm font-bold">What Can You Ask?</CardTitle>
-              </div>
-              <p className="text-[11px] text-muted-foreground mt-1">Plain English or Hindi — no training needed.</p>
-            </CardHeader>
-            <CardContent className="px-0 pb-0">
-              <div className="divide-y divide-border/50">
-                <CommandTile icon={<TrendingUp className="w-3.5 h-3.5" />} role="Owner / CFO" example='"Old stock kitna hai?"' result="₹2.1Cr category-wise breakdown" />
-                <CommandTile icon={<Factory className="w-3.5 h-3.5" />} role="Factory Manager" example='"Unit 2 production status?"' result="Live line capacity + delivery plan" />
-                <CommandTile icon={<Store className="w-3.5 h-3.5" />} role="Store Manager" example='"Navy Polo kab aayega?"' result="Real-time transfer ETA" />
-                <CommandTile icon={<Truck className="w-3.5 h-3.5" />} role="Franchise Team" example='"Indore shipment status?"' result="Dispatch + live tracking update" />
-              </div>
-            </CardContent>
-          </Card>
+
 
           {/* Why WhatsApp */}
-          <Card className="border-border shadow-sm bg-gradient-to-br from-emerald-50/60 to-transparent dark:from-emerald-900/10">
-            <CardContent className="p-5 space-y-4">
-              <div className="flex items-center gap-2 mb-1">
-                <Cpu className="w-4 h-4 text-emerald-600" />
-                <p className="text-sm font-bold">Why WhatsApp?</p>
-              </div>
-              {[
-                { icon: <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />, title: "Zero training required", desc: "Everyone already uses it — your team, vendors, and stores." },
-                { icon: <Zap className="h-3.5 w-3.5 text-emerald-600" />, title: "One message replaces hours of calls", desc: "Approve orders, check shipments, alert teams — all from chat." },
-                { icon: <Activity className="h-3.5 w-3.5 text-emerald-600" />, title: "Works 24/7 without you", desc: "AI handles routine checks while you sleep. You only see what needs a decision." },
-              ].map((item, i) => (
-                <div key={i} className="flex gap-3 items-start">
-                  <div className="h-6 w-6 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center shrink-0 mt-0.5">
-                    {item.icon}
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold mb-0.5">{item.title}</p>
-                    <p className="text-[11px] text-muted-foreground leading-relaxed">{item.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
+
         </div>
       </div>
     </div>

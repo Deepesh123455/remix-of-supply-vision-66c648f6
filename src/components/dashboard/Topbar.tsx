@@ -1,5 +1,6 @@
 import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 const Topbar = ({ onToggleSidebar }: { onToggleSidebar: () => void }) => (
   <header className="h-14 bg-card border-b border-border flex items-center px-4 md:px-6 gap-4 shrink-0">
@@ -7,11 +8,12 @@ const Topbar = ({ onToggleSidebar }: { onToggleSidebar: () => void }) => (
       <Menu className="h-5 w-5" />
     </Button>
 
-    <div className="flex items-center gap-2 min-w-0 shrink-0 sm:shrink">
-      <div className="w-2 h-2 rounded-full bg-primary animate-pulse-dot shrink-0" />
-      <span className="font-bold text-sm text-text-heading tracking-tight truncate">InvisibleCTO</span>
+    <div className="flex flex-col   min-w-0 shrink-0 sm:shrink">
+
+      <Link to="/" className="font-bold text-md text-text-heading tracking-tight truncate">DemandIQ</Link>
+      <span className="text-[11px] text-muted-foreground  hidden sm:inline">powered by InvisibleCTO</span>
+
     </div>
-    <span className="text-[10px] text-muted-foreground tracking-widest uppercase hidden sm:inline">/ Supply Chain OS</span>
 
     <div className="flex-1 flex justify-center">
       <div className="bg-success/10 border border-success/30 text-success text-[11px] px-3 py-1 rounded-full flex items-center gap-1.5">

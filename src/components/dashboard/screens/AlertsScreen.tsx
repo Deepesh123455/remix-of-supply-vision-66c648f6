@@ -55,8 +55,8 @@ const AlertsScreen = () => {
     }
   };
 
-  const allFilteredAlerts = filter === "all" 
-    ? [...criticalAlerts, ...warningAlerts] 
+  const allFilteredAlerts = filter === "all"
+    ? [...criticalAlerts, ...warningAlerts]
     : filter === "critical" ? criticalAlerts : warningAlerts;
 
   const totalPages = Math.ceil(allFilteredAlerts.length / ITEMS_PER_PAGE);
@@ -109,8 +109,8 @@ const AlertsScreen = () => {
             key={tab.id}
             onClick={() => handleFilterChange(tab.id)}
             className={`px-3.5 py-1.5 rounded-lg text-sm font-medium transition-colors ${filter === tab.id
-                ? "bg-foreground text-background"
-                : "bg-muted text-muted-foreground hover:bg-muted/80"
+              ? "bg-foreground text-background"
+              : "bg-muted text-muted-foreground hover:bg-muted/80"
               }`}
           >
             {tab.label}
@@ -135,8 +135,8 @@ const AlertsScreen = () => {
                   alert={alert}
                   type={alert.type as "critical" | "warning"}
                   onAction={() => alert.type === "critical" ? handleAlertAction(alert) : resolveWarning(alert.id, `${alert.action} done!`)}
-                  onResolve={() => alert.type === "critical" 
-                    ? resolveAlert(alert.id, "Got it — AI will remind you tomorrow.") 
+                  onResolve={() => alert.type === "critical"
+                    ? resolveAlert(alert.id, "Got it — AI will remind you tomorrow.")
                     : resolveWarning(alert.id, "Noted — AI will keep monitoring.")
                   }
                 />
@@ -176,11 +176,10 @@ const AlertsScreen = () => {
                   <button
                     key={page}
                     onClick={() => setCurrentPage(page)}
-                    className={`w-8 h-8 rounded-lg text-xs font-bold transition-all ${
-                      currentPage === page 
-                        ? "bg-primary text-primary-foreground" 
+                    className={`w-8 h-8 rounded-lg text-xs font-bold transition-all ${currentPage === page
+                        ? "bg-primary text-primary-foreground"
                         : "hover:bg-muted text-muted-foreground"
-                    }`}
+                      }`}
                   >
                     {page}
                   </button>
@@ -322,10 +321,9 @@ const CollapsibleAlert = ({ alert, type, onAction, onResolve }: {
     <motion.div
       variants={itemVariants}
       layout
-      className={`bg-card border border-border overflow-hidden rounded-xl transition-all duration-300 ${
-        isExpanded ? "ring-1 ring-primary/20 shadow-lg" : "hover:border-primary/20 cursor-pointer"
-      }`}
-      onClick={() => !isExpanded && setIsExpanded(true)}
+      className={`bg-card border border-border overflow-hidden rounded-xl transition-all duration-300 ${isExpanded ? "ring-1 ring-primary/20 shadow-lg" : "hover:border-primary/20 cursor-pointer"
+        }`}
+      onClick={() => setIsExpanded((p) => !p)}
     >
       <div className="p-4 flex items-center justify-between gap-4">
         <div className="flex items-center gap-4 flex-1 min-w-0">
@@ -340,11 +338,10 @@ const CollapsibleAlert = ({ alert, type, onAction, onResolve }: {
         </div>
 
         <div className="flex items-center gap-3 shrink-0 ml-2">
-          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${
-            type === "critical"
+          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${type === "critical"
               ? "text-red-600 bg-red-50 dark:bg-red-950/30 border-red-100 dark:border-red-900/30"
               : "text-amber-600 bg-amber-50 dark:bg-amber-950/30 border-amber-100 dark:border-amber-900/30"
-          }`}>
+            }`}>
             {alert.moneyAtRisk} {type === "critical" ? "at risk" : ""}
           </span>
           <motion.span
@@ -377,11 +374,10 @@ const CollapsibleAlert = ({ alert, type, onAction, onResolve }: {
                     e.stopPropagation();
                     onAction();
                   }}
-                  className={`px-4 py-2 rounded-lg font-bold text-xs transition-all ${
-                    type === "critical"
+                  className={`px-4 py-2 rounded-lg font-bold text-xs transition-all ${type === "critical"
                       ? "bg-primary text-primary-foreground hover:bg-primary/90"
                       : "bg-foreground text-background hover:bg-foreground/90"
-                  }`}
+                    }`}
                 >
                   {alert.action} →
                 </button>

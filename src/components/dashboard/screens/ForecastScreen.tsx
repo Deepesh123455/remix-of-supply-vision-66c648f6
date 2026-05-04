@@ -11,7 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import {
-  AreaChart, Area, Line, XAxis, YAxis, CartesianGrid, Tooltip,
+  AreaChart, Area, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, Legend
 } from "recharts";
 import { toast } from "sonner";
@@ -151,63 +151,107 @@ const ForecastScreen = () => {
                 </Button>
               ))}
             </div>
-          </CardHeader>
-          <CardContent className="px-2">
-            <div className="h-[300px] w-full">
+          </CardHeader>          <CardContent className="px-2">
+            <div className="h-[350px] w-full mt-4">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                   <defs>
                     <linearGradient id="colorForecast" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.15} />
-                      <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
+                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.15} />
+                      <stop offset="95%" stopColor="#10b981" stopOpacity={0.01} />
                     </linearGradient>
+                    <linearGradient id="colorActual" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.15} />
+                      <stop offset="95%" stopColor="#4f46e5" stopOpacity={0.01} />
+                    </linearGradient>
+                    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                      <feGaussianBlur stdDeviation="3" result="blur" />
+                      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                    </filter>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--muted-foreground))" opacity={0.1} />
-                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} dy={10} />
-                  <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} dx={-10} />
+
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--muted-foreground))" opacity={0.08} />
+                  <XAxis
+                    dataKey="name"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))", fontWeight: 500 }}
+                    dy={15}
+                  />
+                  <YAxis
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))", fontWeight: 500 }}
+                    dx={-10}
+                  />
                   <Tooltip
-                    contentStyle={{
-                      backgroundColor: "hsl(var(--card))",
-                      borderColor: "hsl(var(--border))",
-                      borderRadius: "8px",
-                      fontSize: "12px",
+                    content={({ active, payload, label }) => {
+                      if (active && payload && payload.length) {
+                        return (
+                          <div className="bg-background/80 backdrop-blur-md border border-border p-4 rounded-xl shadow-2xl min-w-[160px]">
+                            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-2">{label}</p>
+                            <div className="space-y-2">
+                              {payload.map((entry: any, index: number) => (
+                                <div key={index} className="flex items-center justify-between gap-4">
+                                  <div className="flex items-center gap-2">
+                                    <div className="h-2 w-2 rounded-full" style={{ backgroundColor: entry.color }} />
+                                    <span className="text-xs font-medium text-foreground">{entry.name === "forecast" ? "AI Prediction" : "Actual Sales"}</span>
+                                  </div>
+                                  <span className="text-xs font-bold tabular-nums">
+                                    {entry.value?.toLocaleString()} <span className="text-[10px] font-normal text-muted-foreground">pcs</span>
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      }
+                      return null;
                     }}
-                    formatter={(value: any, name: string) => [
-                      value?.toLocaleString() ?? "—",
-                      name === "forecast" ? "AI Predicted" : "Actual Sales",
-                    ]}
                   />
                   <Area
                     type="monotone"
                     dataKey="forecast"
-                    stroke="hsl(var(--primary))"
-                    strokeWidth={2}
+                    stroke="#10b981"
+                    strokeWidth={3}
                     fillOpacity={1}
                     fill="url(#colorForecast)"
                     name="forecast"
                     connectNulls
+                    dot={false}
+                    animationDuration={1500}
                   />
-                  <Line
+                  <Area
                     type="monotone"
                     dataKey="actual"
-                    stroke="hsl(var(--muted-foreground))"
-                    strokeDasharray="5 5"
-                    strokeWidth={2}
-                    dot={{ r: 4, fill: "hsl(var(--muted-foreground))" }}
+                    stroke="#4f46e5"
+                    strokeWidth={3}
+                    fillOpacity={1}
+                    fill="url(#colorActual)"
                     name="actual"
-                    connectNulls={false}
+                    dot={false}
+                    animationDuration={1500}
                   />
                   <Legend
-                    iconType="circle"
                     verticalAlign="top"
                     align="right"
-                    wrapperStyle={{ fontSize: "10px", paddingBottom: "20px" }}
-                    formatter={(value) => value === "forecast" ? "AI Predicted" : "Actual Sales"}
+                    iconType="square"
+                    iconSize={10}
+                    wrapperStyle={{ fontSize: "11px", fontWeight: 600, paddingBottom: "30px" }}
+                    formatter={(value) => (
+                      <span className="text-foreground/70 uppercase tracking-tighter text-[9px]">
+                        {value === "forecast" ? "AI Projected Demand" : "Live Sales Performance"}
+                      </span>
+                    )}
                   />
+
+
                 </AreaChart>
               </ResponsiveContainer>
             </div>
           </CardContent>
+
+
         </Card>
 
         <div className="space-y-6">
@@ -405,7 +449,7 @@ const ForecastScreen = () => {
                       </div>
                     </TableCell>
                     <TableCell className="text-right pr-6">
-                      <Button variant="ghost" size="sm" className="h-8 group-hover:bg-primary/10 group-hover:text-primary transition-all">
+                      <Button variant="ghost" size="sm" className="h-8 group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300 shadow-sm group-hover:shadow-md">
                         Details <ArrowUpRight className="w-3 h-3 ml-1" />
                       </Button>
                     </TableCell>
@@ -513,7 +557,7 @@ const ForecastScreen = () => {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={handlePlaceOrder}
-                    className="flex-1 py-3 rounded-xl bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground text-sm font-bold transition-all shadow-lg hover:shadow-primary/30 flex items-center justify-center gap-2"
+                    className="flex-1 py-3 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-bold transition-all shadow-lg hover:shadow-primary/30 flex items-center justify-center gap-2"
                   >
                     <ShoppingBag className="w-4 h-4" />
                     Place Order
