@@ -81,9 +81,9 @@ const SuppliersScreen = () => {
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
         {/* Vendor Table */}
-        <Card className="lg:col-span-2 border-border shadow-sm overflow-hidden">
+        <Card className="lg:col-span-2 border-border shadow-sm overflow-hidden flex flex-col">
           <CardHeader className="px-6 border-b border-border/50 bg-muted/5">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
@@ -101,7 +101,7 @@ const SuppliersScreen = () => {
               </div>
             </div>
           </CardHeader>
-          <CardContent className="p-0">
+          <CardContent className="p-0 flex-1 flex flex-col">
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader className="bg-muted/10">
@@ -165,7 +165,7 @@ const SuppliersScreen = () => {
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="flex items-center justify-between p-4 border-t border-border/50 bg-muted/5">
+              <div className="flex items-center justify-between p-4 border-t border-border/50 bg-muted/5 mt-auto shrink-0">
                 <p className="text-[10px] text-muted-foreground font-medium">
                   Showing <span className="text-foreground">{(currentPage - 1) * ITEMS_PER_PAGE + 1}</span> to <span className="text-foreground">{Math.min(currentPage * ITEMS_PER_PAGE, filtered.length)}</span> of <span className="text-foreground">{filtered.length}</span> vendors
                 </p>
@@ -185,8 +185,8 @@ const SuppliersScreen = () => {
         {/* Sidebar */}
         <div className="space-y-6">
           {/* Auto-Pilot */}
-          <Card className="border-border shadow-sm">
-            <CardHeader className="pb-4">
+          <Card className="border-border shadow-sm flex flex-col max-h-[420px]">
+            <CardHeader className="pb-4 shrink-0">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Bot className="w-4 h-4 text-primary" />
@@ -196,44 +196,46 @@ const SuppliersScreen = () => {
                   <Settings2 className="w-4 h-4 text-muted-foreground" />
                 </Button>
               </div>
-              <p className="text-xs text-muted-foreground mt-1">Turn ON to let AI place orders automatically when stock runs low</p>
+              <p className="text-xs text-muted-foreground mt-1">Turn ON to let AI place orders automatically</p>
             </CardHeader>
-            <CardContent className="space-y-3">
-              {suppliers.map(s => (
-                <motion.div
-                  key={s.id}
-                  layout
-                  className="flex items-center justify-between p-3 rounded-lg border border-border/50 bg-muted/10 hover:bg-muted/20 transition-colors"
-                >
-                  <div>
-                    <div className="text-xs font-bold truncate max-w-[140px]">{s.name.split(" ").slice(0, 3).join(" ")}</div>
-                    <div className="text-[10px] text-muted-foreground">{s.autoPilotMode}</div>
-                  </div>
-                  <Switch
-                    checked={s.autoPilot}
-                    onCheckedChange={() => toggleSupplierAutoPilot(s.id)}
-                  />
-                </motion.div>
-              ))}
-              <div className="mt-2 p-3 bg-primary/5 rounded-lg border border-primary/10">
+            <CardContent className="space-y-3 overflow-hidden flex flex-col flex-1 pb-4">
+              <div className="space-y-3 overflow-y-auto pr-2 no-scrollbar flex-1">
+                {suppliers.map(s => (
+                  <motion.div
+                    key={s.id}
+                    layout
+                    className="flex items-center justify-between p-3 rounded-lg border border-border/50 bg-muted/10 hover:bg-muted/20 transition-colors"
+                  >
+                    <div>
+                      <div className="text-xs font-bold truncate max-w-[140px]">{s.name.split(" ").slice(0, 3).join(" ")}</div>
+                      <div className="text-[10px] text-muted-foreground">{s.autoPilotMode}</div>
+                    </div>
+                    <Switch
+                      checked={s.autoPilot}
+                      onCheckedChange={() => toggleSupplierAutoPilot(s.id)}
+                    />
+                  </motion.div>
+                ))}
+              </div>
+              <div className="mt-2 p-3 bg-primary/5 rounded-lg border border-primary/10 shrink-0">
                 <p className="text-[11px] text-foreground font-medium leading-relaxed">
                   <Zap className="w-3 h-3 text-primary inline-block mr-1 mb-0.5" />
-                  AI sent <span className="font-bold">11 orders</span> and <span className="font-bold">3 vendor requests</span> today without you having to do anything.
+                  AI sent <span className="font-bold">11 orders</span> today.
                 </p>
               </div>
             </CardContent>
           </Card>
 
           {/* Comms Log */}
-          <Card className="border-border shadow-sm">
-            <CardHeader className="pb-3">
+          <Card className="border-border shadow-sm max-h-[380px] flex flex-col">
+            <CardHeader className="pb-3 shrink-0">
               <div className="flex items-center gap-2">
                 <MessageSquare className="w-4 h-4 text-primary" />
                 <CardTitle className="text-base">Recent Messages</CardTitle>
               </div>
             </CardHeader>
-            <CardContent className="p-0">
-              <div className="divide-y divide-border/50">
+            <CardContent className="p-0 overflow-hidden flex flex-col flex-1">
+              <div className="divide-y divide-border/50 overflow-y-auto no-scrollbar flex-1">
                 {COMMS_LOG.map((log, i) => (
                   <div
                     key={i}
@@ -256,7 +258,7 @@ const SuppliersScreen = () => {
               </div>
               <Button
                 variant="ghost"
-                className="w-full text-[10px] h-9 text-muted-foreground hover:text-primary"
+                className="w-full text-[10px] h-9 text-muted-foreground hover:text-primary shrink-0 mt-auto border-t border-border/50 bg-muted/5 rounded-none"
                 onClick={() => toast.info("Full message history — feature coming soon.")}
               >
                 See All Messages <ChevronRight className="w-3 h-3 ml-1" />
