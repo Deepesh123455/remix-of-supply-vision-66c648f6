@@ -174,7 +174,7 @@ function Navbar({ onCTA }: { onCTA: () => void }) {
         <div className="flex flex-col ">
 
           <span className="text-lg font-bold tracking-tight" style={{ color: "#1C1917" }}>
-            SupplyVision
+            ChainOS
           </span>
           <span className="text-xs text-zinc-500 ">
             Powered by InvisibleCTO

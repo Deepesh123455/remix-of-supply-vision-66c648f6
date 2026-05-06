@@ -10,7 +10,7 @@ const Topbar = ({ onToggleSidebar }: { onToggleSidebar: () => void }) => (
 
     <div className="flex flex-col   min-w-0 shrink-0 sm:shrink">
 
-      <Link to="/" className="font-bold text-md text-text-heading tracking-tight truncate">DemandIQ</Link>
+      <Link to="/" className="font-bold text-md text-text-heading tracking-tight truncate">ChainOS</Link>
       <span className="text-[11px] text-muted-foreground  hidden sm:inline">powered by InvisibleCTO</span>
 
     </div>
